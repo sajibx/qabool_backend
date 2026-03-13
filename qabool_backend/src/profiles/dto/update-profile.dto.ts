@@ -28,10 +28,10 @@ export class UpdateProfileDto {
   @IsDateString()
   dob?: string;
 
-  @ApiProperty({ enum: Gender, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsEnum(Gender)
-  gender?: Gender;
+  @IsString()
+  gender?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

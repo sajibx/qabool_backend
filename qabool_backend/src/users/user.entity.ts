@@ -41,8 +41,8 @@ export class User {
   dob: Date;
 
   @ApiProperty()
-  @Column({ type: 'enum', enum: Gender, nullable: true })
-  gender: Gender;
+  @Column({ nullable: true })
+  gender: string;
 
   @ApiProperty()
   @Column({ nullable: true })
