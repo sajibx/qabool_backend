@@ -17,11 +17,13 @@ export class ProfilesController {
   @ApiOperation({ summary: 'Get discovery list' })
   @ApiQuery({ name: 'religion', required: false })
   @ApiQuery({ name: 'region', required: false })
+  @ApiQuery({ name: 'gender', required: false })
   async findAll(
     @Query('religion') religion?: string,
     @Query('region') region?: string,
+    @Query('gender') gender?: string,
   ) {
-    return this.profilesService.findAll({ religion, region });
+    return this.profilesService.findAll({ religion, region, gender });
   }
 
   @Get('me')

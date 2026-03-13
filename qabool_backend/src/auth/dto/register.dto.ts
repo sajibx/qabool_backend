@@ -20,4 +20,9 @@ export class RegisterDto {
   @IsString()
   @MaxLength(50)
   lastName?: string;
+
+  @ApiProperty({ example: 'Male', enum: ['Male', 'Female'], required: false })
+  @IsOptional()
+  @IsString()
+  gender?: string;
 }

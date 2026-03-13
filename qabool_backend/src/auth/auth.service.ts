@@ -24,6 +24,7 @@ export class AuthService {
       passwordHash,
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,
+      gender: registerDto.gender,
     });
 
     return this.login({ email: user.email, password: registerDto.password });
@@ -48,6 +49,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        gender: user.gender,
       },
     };
   }

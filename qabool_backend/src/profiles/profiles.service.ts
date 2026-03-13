@@ -11,7 +11,7 @@ export class ProfilesService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async findAll(filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number }) {
+  async findAll(filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string }) {
     const query = this.usersRepository.createQueryBuilder('user');
 
     if (filters.religion) {
@@ -20,6 +20,10 @@ export class ProfilesService {
 
     if (filters.region) {
       query.andWhere('user.region = :region', { region: filters.region });
+    }
+
+    if (filters.gender) {
+      query.andWhere('user.gender = :gender', { gender: filters.gender });
     }
 
     // Basic age filtering assuming we had an age field or calculated from dob
