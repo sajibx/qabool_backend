@@ -24,6 +24,13 @@ export class MessagingController {
     return this.messagingService.findChatMessages(id);
   }
 
+  @Post(':id/read')
+  @ApiOperation({ summary: 'Mark messages in a chat as read' })
+  async markAsRead(@GetUser() user: User, @Param('id') id: string) {
+    await this.messagingService.markAsRead(id, user.id);
+    return { success: true };
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create or find a chat' })
   async createChat(@GetUser() user: User, @Body('recipientId') recipientId: string) {

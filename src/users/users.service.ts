@@ -22,4 +22,11 @@ export class UsersService {
   async findById(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
   }
+
+  async update(id: string, userData: Partial<User>): Promise<User> {
+    await this.usersRepository.update(id, userData);
+    const updatedUser = await this.findById(id);
+    if (!updatedUser) throw new Error('User not found');
+    return updatedUser;
+  }
 }
