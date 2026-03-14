@@ -17,6 +17,7 @@ export class ConnectionsController {
   @Post()
   @ApiOperation({ summary: 'Send a connection request' })
   async create(@GetUser() user: User, @Body() createConnectionDto: CreateConnectionDto) {
+    console.log(`Connection request: ${user.id} -> ${createConnectionDto.recipientId}`);
     return this.connectionsService.createRequest(user.id, createConnectionDto.recipientId);
   }
 

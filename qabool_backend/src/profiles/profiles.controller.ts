@@ -8,13 +8,17 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from '../users/user.entity';
+import { ImageService } from '../common/services/image.service';
 
 @ApiTags('profiles')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('profiles')
 export class ProfilesController {
-  constructor(private readonly profilesService: ProfilesService) {}
+  constructor(
+    private readonly profilesService: ProfilesService,
+    private readonly imageService: ImageService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get discovery list' })
@@ -27,7 +31,7 @@ export class ProfilesController {
     @Query('region') region?: string,
     @Query('gender') gender?: string,
   ) {
-    return this.profilesService.findAll({ religion, region, gender }, user.id);
+    return this.profilesService.findAll({ religion, region, gender }, user);
   }
 
   @Get('me')
@@ -52,7 +56,11 @@ export class ProfilesController {
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() file?: any
   ) {
-    return this.profilesService.update(user.id, updateProfileDto, file?.path);
+    let profileImagePath = file?.path;
+    if (file) {
+      profileImagePath = await this.imageService.convertToJpeg(file.path);
+    }
+    return this.profilesService.update(user.id, updateProfileDto, profileImagePath);
   }
 
   @Get(':id')

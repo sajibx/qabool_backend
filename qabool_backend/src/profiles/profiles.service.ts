@@ -15,10 +15,25 @@ export class ProfilesService {
 
   async findAll(
     filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string },
-    currentUserId?: string,
+    currentUser: User,
   ) {
     const query = this.usersRepository.createQueryBuilder('user')
-      .where('user.status = :status', { status: 'ACTIVE' });
+      .where('user.status = :status', { status: 'ACTIVE' })
+      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
+
+    // Determine target gender if not explicitly provided
+    let targetGender = filters.gender;
+    if (!targetGender) {
+      if (currentUser.gender?.toLowerCase() === 'male') {
+        targetGender = 'female';
+      } else if (currentUser.gender?.toLowerCase() === 'female') {
+        targetGender = 'male';
+      }
+    }
+
+    if (targetGender) {
+      query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender.toLowerCase() });
+    }
 
     if (filters.religion) {
       query.andWhere('user.religion LIKE :religion', { religion: `%${filters.religion}%` });
@@ -28,17 +43,22 @@ export class ProfilesService {
       query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
 
-    if (filters.gender) {
-      query.andWhere('user.gender = :gender', { gender: filters.gender });
-    }
-
     const users = await query.getMany();
 
-    if (currentUserId) {
+    if (currentUser.id) {
       for (const user of users) {
-        user.isFavorited = await this.favoritesService.isFavorite(currentUserId, user.id);
+        user.isFavorited = await this.favoritesService.isFavorite(currentUser.id, user.id);
+        
+        // Calculate isOnline (last 5 minutes)
+        if (user.lastSeen) {
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+          user.isOnline = user.lastSeen > fiveMinutesAgo;
+        } else {
+          user.isOnline = false;
+        }
+
         if (user.isFavorited) {
-          console.log(`User ${currentUserId} has favorited ${user.id} (Found in list)`);
+          console.log(`User ${currentUser.id} has favorited ${user.id} (Found in list)`);
         }
       }
     }
@@ -55,6 +75,14 @@ export class ProfilesService {
     if (currentUserId) {
       user.isFavorited = await this.favoritesService.isFavorite(currentUserId, user.id);
       console.log(`Checking if ${currentUserId} favorited ${user.id}: ${user.isFavorited}`);
+    }
+
+    // Calculate isOnline
+    if (user.lastSeen) {
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      user.isOnline = user.lastSeen > fiveMinutesAgo;
+    } else {
+      user.isOnline = false;
     }
 
     return user;

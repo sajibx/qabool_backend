@@ -4,13 +4,17 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { ImageService } from '../common/services/image.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private imageService: ImageService,
+  ) {}
 
   @Post('register')
   @UseInterceptors(FileInterceptor('profileImage', {
@@ -29,7 +33,11 @@ export class AuthController {
     @Body() registerDto: RegisterDto,
     @UploadedFile() file?: any
   ) {
-    return this.authService.register(registerDto, file?.path);
+    let profileImagePath = file?.path;
+    if (file) {
+      profileImagePath = await this.imageService.convertToJpeg(file.path);
+    }
+    return this.authService.register(registerDto, profileImagePath);
   }
 
   @Post('login')

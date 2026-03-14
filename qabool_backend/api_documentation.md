@@ -34,11 +34,14 @@ This document provides all the necessary details to integrate the Qabool backend
 {
   "access_token": "eyJhbG...",
   "user": {
-    "id": "uuid-string",
+    "id": "cd34387d-d5c0-46f0-8bb4-435ab8411be7",
     "email": "user@example.com",
     "firstName": "John",
     "lastName": "Doe",
-    "status": "INACTIVE"
+    "status": "INACTIVE",
+    "profileImageUrl": "/uploads/random_profile_converted.jpg",
+    "lastSeen": "2026-03-14T17:30:00Z",
+    "isOnline": true
   }
 }
 ```

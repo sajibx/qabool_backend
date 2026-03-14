@@ -29,4 +29,8 @@ export class UsersService {
     if (!updatedUser) throw new Error('User not found');
     return updatedUser;
   }
+
+  async updateLastSeen(id: string): Promise<void> {
+    await this.usersRepository.update(id, { lastSeen: new Date() });
+  }
 }

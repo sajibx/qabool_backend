@@ -14,8 +14,12 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto, profileImagePath?: string) {
+    console.log('Registering user:', registerDto.email);
+    console.log('Registration data:', registerDto);
+    
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
+      console.log('User already exists:', registerDto.email);
       throw new ConflictException('Email already exists');
     }
 
@@ -24,35 +28,43 @@ export class AuthService {
     // Normalize path for web access
     const profileImageUrl = profileImagePath ? `/${profileImagePath.replace(/\\/g, '/')}` : null;
 
-    const user = await this.usersService.create({
-      email: registerDto.email,
-      passwordHash: hashedPassword,
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      gender: registerDto.gender,
-      region: registerDto.region,
-      religion: registerDto.religion,
-      ethnicity: registerDto.ethnicity,
-      height: registerDto.height,
-      weight: registerDto.weight,
-      profession: registerDto.profession,
-      education: registerDto.education,
-      specialConsiderations: registerDto.specialConsiderations,
-      profileImageUrl: profileImageUrl as string,
-      dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
-    });
+    try {
+      const user = await this.usersService.create({
+        email: registerDto.email,
+        passwordHash: hashedPassword,
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+        gender: registerDto.gender,
+        region: registerDto.region,
+        religion: registerDto.religion,
+        ethnicity: registerDto.ethnicity,
+        height: registerDto.height,
+        weight: registerDto.weight,
+        profession: registerDto.profession,
+        education: registerDto.education,
+        specialConsiderations: registerDto.specialConsiderations,
+        profileImageUrl: profileImageUrl as string,
+        dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
+      });
 
-    const payload = { sub: user.id, email: user.email };
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        status: user.status,
-      },
-    };
+      console.log('User created successfully:', user.id);
+
+      const payload = { sub: user.id, email: user.email };
+      return {
+        access_token: this.jwtService.sign(payload),
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          status: user.status,
+          profileImageUrl: user.profileImageUrl,
+        },
+      };
+    } catch (error) {
+      console.error('Error creating user in database:', error);
+      throw error;
+    }
   }
 
   async login(loginDto: LoginDto) {
@@ -79,6 +91,7 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         status: user.status,
+        profileImageUrl: user.profileImageUrl,
       },
     };
   }

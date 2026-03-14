@@ -9,7 +9,10 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { CommonModule } from './common/common.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LastSeenInterceptor } from './common/interceptors/last-seen.interceptor';
 import { join } from 'path';
 
 @Module({
@@ -35,8 +38,15 @@ import { join } from 'path';
     ConnectionsModule,
     MessagingModule,
     FavoritesModule,
+    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LastSeenInterceptor,
+    },
+  ],
 })
 export class AppModule {}

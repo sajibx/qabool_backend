@@ -66,11 +66,11 @@ export class User {
   ethnicity: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   height: number;
 
   @ApiProperty()
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   weight: number;
 
   @ApiProperty()
@@ -95,6 +95,9 @@ export class User {
 
   @ApiProperty()
   isFavorited?: boolean;
+
+  @ApiProperty()
+  public isOnline?: boolean;
 
   @ApiProperty()
   @CreateDateColumn()
