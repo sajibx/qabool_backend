@@ -25,4 +25,52 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   gender?: string;
+
+  @ApiProperty({ example: '1990-01-01', required: false })
+  @IsOptional()
+  @IsString()
+  dob?: string;
+
+  @ApiProperty({ example: 'South Asian', required: false })
+  @IsOptional()
+  @IsString()
+  ethnicity?: string;
+
+  @ApiProperty({ example: 'Islam', required: false })
+  @IsOptional()
+  @IsString()
+  religion?: string;
+
+  @ApiProperty({ example: 175, required: false })
+  @IsOptional()
+  height?: number;
+
+  @ApiProperty({ example: 70, required: false })
+  @IsOptional()
+  weight?: number;
+
+  @ApiProperty({ example: 'Software Engineer', required: false })
+  @IsOptional()
+  @IsString()
+  profession?: string;
+
+  @ApiProperty({ example: 'Bachelor of Science', required: false })
+  @IsOptional()
+  @IsString()
+  education?: string;
+
+  @ApiProperty({ example: 'I love coding...', required: false })
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @ApiProperty({ example: 'N/A', required: false })
+  @IsOptional()
+  @IsString()
+  specialConsiderations?: string;
+
+  @ApiProperty({ example: 'Berlin, Germany', required: false })
+  @IsOptional()
+  @IsString()
+  region?: string;
 }

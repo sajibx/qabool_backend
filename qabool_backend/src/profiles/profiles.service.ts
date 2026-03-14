@@ -17,14 +17,15 @@ export class ProfilesService {
     filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string },
     currentUserId?: string,
   ) {
-    const query = this.usersRepository.createQueryBuilder('user');
+    const query = this.usersRepository.createQueryBuilder('user')
+      .where('user.status = :status', { status: 'ACTIVE' });
 
     if (filters.religion) {
-      query.andWhere('user.religion = :religion', { religion: filters.religion });
+      query.andWhere('user.religion LIKE :religion', { religion: `%${filters.religion}%` });
     }
-
+ 
     if (filters.region) {
-      query.andWhere('user.region = :region', { region: filters.region });
+      query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
 
     if (filters.gender) {

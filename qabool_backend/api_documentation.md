@@ -28,6 +28,8 @@ This document provides all the necessary details to integrate the Qabool backend
 ```
 
 **Response (201 Created):**
+> [!NOTE]
+> Newly registered users are assigned an `INACTIVE` status by default and require admin approval before they can log in.
 ```json
 {
   "access_token": "eyJhbG...",
@@ -35,7 +37,8 @@ This document provides all the necessary details to integrate the Qabool backend
     "id": "uuid-string",
     "email": "user@example.com",
     "firstName": "John",
-    "lastName": "Doe"
+    "lastName": "Doe",
+    "status": "INACTIVE"
   }
 }
 ```
@@ -52,7 +55,11 @@ This document provides all the necessary details to integrate the Qabool backend
 ```
 
 **Response (200 OK):**
-Same as Register response.
+Same as Register response (but only for `ACTIVE` users).
+
+**Error (401 Unauthorized):**
+- **Invalid Credentials**: `{"message": "Invalid credentials", "statusCode": 401}`
+- **Pending Approval**: `{"message": "Your account is pending admin approval", "statusCode": 401}`
 
 ---
 

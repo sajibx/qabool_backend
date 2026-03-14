@@ -7,6 +7,11 @@ export enum Gender {
   OTHER = 'OTHER',
 }
 
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
 @Entity('users')
 export class User {
   @ApiProperty()
@@ -43,6 +48,10 @@ export class User {
   @ApiProperty()
   @Column({ nullable: true })
   gender: string;
+
+  @ApiProperty()
+  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.INACTIVE })
+  status: UserStatus;
 
   @ApiProperty()
   @Column({ nullable: true })
