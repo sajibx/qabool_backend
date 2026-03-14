@@ -1,4 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -10,11 +13,23 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
+  @UseInterceptors(FileInterceptor('profileImage', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req: any, file: any, cb: any) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        return cb(null, `${randomName}${extname(file.originalname)}`);
+      },
+    }),
+  }))
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User successfully registered.' })
   @ApiResponse({ status: 409, description: 'User already exists.' })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+    @UploadedFile() file?: any
+  ) {
+    return this.authService.register(registerDto, file?.path);
   }
 
   @Post('login')

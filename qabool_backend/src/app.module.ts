@@ -9,9 +9,15 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',

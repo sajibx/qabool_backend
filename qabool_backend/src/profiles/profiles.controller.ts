@@ -1,4 +1,7 @@
-import { Controller, Get, Put, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, UseGuards, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -34,12 +37,22 @@ export class ProfilesController {
   }
 
   @Put('me')
+  @UseInterceptors(FileInterceptor('profileImage', {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req: any, file: any, cb: any) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        return cb(null, `${randomName}${extname(file.originalname)}`);
+      },
+    }),
+  }))
   @ApiOperation({ summary: 'Update current user profile' })
   async updateMe(
     @GetUser() user: User,
     @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() file?: any
   ) {
-    return this.profilesService.update(user.id, updateProfileDto);
+    return this.profilesService.update(user.id, updateProfileDto, file?.path);
   }
 
   @Get(':id')

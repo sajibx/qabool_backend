@@ -13,29 +13,33 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto, profileImagePath?: string) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Email already exists');
     }
 
-    const passwordHash = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    
+    // Normalize path for web access
+    const profileImageUrl = profileImagePath ? `/${profileImagePath.replace(/\\/g, '/')}` : null;
+
     const user = await this.usersService.create({
       email: registerDto.email,
-      passwordHash,
+      passwordHash: hashedPassword,
       firstName: registerDto.firstName,
       lastName: registerDto.lastName,
       gender: registerDto.gender,
-      dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
-      ethnicity: registerDto.ethnicity,
+      region: registerDto.region,
       religion: registerDto.religion,
+      ethnicity: registerDto.ethnicity,
       height: registerDto.height,
       weight: registerDto.weight,
       profession: registerDto.profession,
       education: registerDto.education,
-      bio: registerDto.bio,
       specialConsiderations: registerDto.specialConsiderations,
-      region: registerDto.region,
+      profileImageUrl: profileImageUrl as string,
+      dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
     });
 
     const payload = { sub: user.id, email: user.email };

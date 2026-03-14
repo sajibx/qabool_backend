@@ -60,13 +60,17 @@ export class ProfilesService {
     return user;
   }
 
-  async update(id: string, updateProfileDto: UpdateProfileDto): Promise<User> {
+  async update(id: string, updateProfileDto: UpdateProfileDto, profileImagePath?: string): Promise<User> {
     const user = await this.findOne(id);
     
-    // Convert dob string to Date object if present
-    const updateData = { ...updateProfileDto };
-    if (updateProfileDto.dob) {
-      updateData.dob = new Date(updateProfileDto.dob) as any;
+    const updateData: any = { ...updateProfileDto };
+
+    if (profileImagePath) {
+      updateData.profileImageUrl = `/${profileImagePath.replace(/\\/g, '/')}`;
+    }
+
+    if (updateData.dob) {
+      updateData.dob = new Date(updateData.dob);
     }
 
     Object.assign(user, updateData);
