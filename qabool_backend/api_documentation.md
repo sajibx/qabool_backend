@@ -194,7 +194,38 @@ Returns the full User object of the authenticated user.
 
 ---
 
-## Guide for Frontend Implementation
+## 5. Favorites (Authenticated, Real-time)
+
+### Add to Favorites
+`POST /favorites/:id`
+- Adds the specified user to your favorites.
+- Triggers a `new_favorite` WebSocket event to the target user.
+
+### Remove from Favorites
+`DELETE /favorites/:id`
+- Removes the specified user from your favorites.
+
+### List My Favorites
+`GET /favorites/my`
+- Returns a list of User objects you have favorited.
+
+### List Users who Favorited Me
+`GET /favorites/by-whom`
+- Returns a list of User objects who have added you to their favorites.
+
+#### Real-time Favorite Notification
+- **Event**: `new_favorite`
+- **Data**:
+  ```json
+  {
+    "from": {
+      "id": "uuid",
+      "firstName": "...",
+      "lastName": "...",
+      "profileImageUrl": "..."
+    }
+  }
+  ```
 
 1. **State Persistence**: Store the `access_token` securely (e.g., `flutter_secure_storage`).
 2. **Global Headers**: Attach the token to every request using an Interceptor (e.g., Dio Interceptor).

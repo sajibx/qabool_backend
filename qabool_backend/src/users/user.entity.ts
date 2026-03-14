@@ -85,6 +85,9 @@ export class User {
   lastSeen: Date;
 
   @ApiProperty()
+  isFavorited?: boolean;
+
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 

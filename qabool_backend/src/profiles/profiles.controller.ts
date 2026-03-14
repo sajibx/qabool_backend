@@ -19,17 +19,18 @@ export class ProfilesController {
   @ApiQuery({ name: 'region', required: false })
   @ApiQuery({ name: 'gender', required: false })
   async findAll(
+    @GetUser() user: User,
     @Query('religion') religion?: string,
     @Query('region') region?: string,
     @Query('gender') gender?: string,
   ) {
-    return this.profilesService.findAll({ religion, region, gender });
+    return this.profilesService.findAll({ religion, region, gender }, user.id);
   }
 
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
   async findMe(@GetUser() user: User) {
-    return this.profilesService.findOne(user.id);
+    return this.profilesService.findOne(user.id, user.id);
   }
 
   @Put('me')
@@ -43,7 +44,7 @@ export class ProfilesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get profile by ID' })
-  async findOne(@Param('id') id: string) {
-    return this.profilesService.findOne(id);
+  async findOne(@GetUser() user: User, @Param('id') id: string) {
+    return this.profilesService.findOne(id, user.id);
   }
 }

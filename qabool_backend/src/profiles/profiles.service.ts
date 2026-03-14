@@ -3,15 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class ProfilesService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private favoritesService: FavoritesService,
   ) {}
 
-  async findAll(filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string }) {
+  async findAll(
+    filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string },
+    currentUserId?: string,
+  ) {
     const query = this.usersRepository.createQueryBuilder('user');
 
     if (filters.religion) {
@@ -26,16 +31,31 @@ export class ProfilesService {
       query.andWhere('user.gender = :gender', { gender: filters.gender });
     }
 
-    // Basic age filtering assuming we had an age field or calculated from dob
-    // For now, just returning all with basic filters
-    return query.getMany();
+    const users = await query.getMany();
+
+    if (currentUserId) {
+      for (const user of users) {
+        user.isFavorited = await this.favoritesService.isFavorite(currentUserId, user.id);
+        if (user.isFavorited) {
+          console.log(`User ${currentUserId} has favorited ${user.id} (Found in list)`);
+        }
+      }
+    }
+
+    return users;
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string, currentUserId?: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('Profile not found');
     }
+
+    if (currentUserId) {
+      user.isFavorited = await this.favoritesService.isFavorite(currentUserId, user.id);
+      console.log(`Checking if ${currentUserId} favorited ${user.id}: ${user.isFavorited}`);
+    }
+
     return user;
   }
 

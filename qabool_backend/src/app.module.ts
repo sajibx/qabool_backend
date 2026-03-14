@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { MessagingModule } from './messaging/messaging.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MessagingModule } from './messaging/messaging.module';
     ProfilesModule,
     ConnectionsModule,
     MessagingModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
