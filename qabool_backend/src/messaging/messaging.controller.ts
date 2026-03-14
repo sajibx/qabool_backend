@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { MessagingService } from './messaging.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -19,9 +19,13 @@ export class MessagingController {
   }
 
   @Get(':id/messages')
-  @ApiOperation({ summary: 'Fetch message history' })
-  async findChatMessages(@Param('id') id: string) {
-    return this.messagingService.findChatMessages(id);
+  @ApiOperation({ summary: 'Fetch message history with pagination' })
+  async findChatMessages(
+    @Param('id') id: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 20,
+  ) {
+    return this.messagingService.findChatMessages(id, +page, +limit);
   }
 
   @Post(':id/read')

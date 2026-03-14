@@ -55,12 +55,24 @@ export class MessagingService {
     );
   }
 
-  async findChatMessages(chatId: string) {
-    return this.messagesRepository.find({
+  async findChatMessages(chatId: string, page: number = 1, limit: number = 20) {
+    const [messages, total] = await this.messagesRepository.findAndCount({
       where: { chatId },
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
       relations: ['sender'],
+      take: limit,
+      skip: (page - 1) * limit,
     });
+
+    return {
+      messages: messages.reverse(), // Reverse to return in chronological order after fetching latest
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async saveMessage(chatId: string, senderId: string, content: string, type: MessageType) {

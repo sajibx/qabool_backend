@@ -156,11 +156,29 @@ Returns the full User object of the authenticated user.
 ]
 ```
 
-### Get Message History
+### Fetch Message History
 `GET /chats/:id/messages`
+*Supports query params: `page` (default: 1), `limit` (default: 20)*
 
 **Response (200 OK):**
-List of message objects.
+```json
+{
+  "messages": [
+    {
+      "id": "msg-uuid",
+      "content": "Hi there",
+      "createdAt": "...",
+      "sender": { "id": "uuid", "firstName": "..." }
+    }
+  ],
+  "meta": {
+    "total": 50,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 3
+  }
+}
+```
 
 ### WebSocket Integration (Socket.io)
 **URL**: `ws://localhost:3000`
