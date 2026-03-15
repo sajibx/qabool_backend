@@ -5,25 +5,28 @@ import {
   WebSocketServer,
   ConnectedSocket,
   OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UseGuards, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { MessagingService } from './messaging.service';
 import { MessageType } from './entities/message.entity';
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class MessagingGateway implements OnGatewayConnection {
+export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly messagingService: MessagingService,
+    private readonly usersService: UsersService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -34,9 +37,21 @@ export class MessagingGateway implements OnGatewayConnection {
       }
       const payload = await this.jwtService.verifyAsync(token);
       client.data.user = payload;
-      client.join(`user_${payload.sub}`);
+      const userId = payload.sub.toString();
+      client.join(`user_${userId}`);
+      await this.usersService.updateLastSeen(userId);
+      console.log(`Socket ${client.id} joined room: user_${userId}`);
     } catch (e) {
       client.disconnect();
+    }
+  }
+
+  handleDisconnect(client: Socket) {
+    const user = client.data.user;
+    if (user) {
+      const userId = user.sub.toString();
+      client.leave(`user_${userId}`);
+      console.log(`Socket ${client.id} left room: user_${userId}`);
     }
   }
 
@@ -45,12 +60,15 @@ export class MessagingGateway implements OnGatewayConnection {
     @MessageBody() data: { chatId: string; recipientId: string; content: string; type: MessageType },
     @ConnectedSocket() client: Socket,
   ) {
-    const senderId = client.data.user.sub;
+    const senderId = client.data.user.sub.toString();
+    const recipientId = data.recipientId.toString();
+    
+    await this.usersService.updateLastSeen(senderId);
     const message = await this.messagingService.saveMessage(data.chatId, senderId, data.content, data.type);
     
     // Emit to both parties
     this.server.to(`user_${senderId}`).emit('new_message', message);
-    this.server.to(`user_${data.recipientId}`).emit('new_message', message);
+    this.server.to(`user_${recipientId}`).emit('new_message', message);
     
     return message;
   }
@@ -60,8 +78,11 @@ export class MessagingGateway implements OnGatewayConnection {
     @MessageBody() data: { chatId: string; recipientId: string; isTyping: boolean },
     @ConnectedSocket() client: Socket,
   ) {
-    const senderId = client.data.user.sub;
-    this.server.to(`user_${data.recipientId}`).emit('typing_status', {
+    const senderId = client.data.user.sub.toString();
+    const recipientId = data.recipientId.toString();
+    
+    await this.usersService.updateLastSeen(senderId);
+    this.server.to(`user_${recipientId}`).emit('typing_status', {
       chatId: data.chatId,
       senderId,
       isTyping: data.isTyping,

@@ -37,9 +37,14 @@ export class FavoritesService {
     const saved = await this.favoritesRepository.save(favorite);
 
     // Notify target user
-    const fromUser = await this.usersRepository.findOne({ where: { id: userId } });
+    const userIdStr = userId.toString();
+    const targetIdStr = targetId.toString();
+    
+    console.log(`Notifying new favorite: from=${userIdStr}, to=${targetIdStr}`);
+    
+    const fromUser = await this.usersRepository.findOne({ where: { id: userIdStr } });
     if (fromUser) {
-      this.messagingGateway.notifyNewFavorite(targetId, fromUser);
+      this.messagingGateway.notifyNewFavorite(targetIdStr, fromUser);
     }
 
     return saved;

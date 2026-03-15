@@ -59,9 +59,14 @@ export class ConnectionsService {
     const saved = await this.connectionsRepository.save(connection);
 
     // Notify
-    const requester = await this.usersRepository.findOne({ where: { id: requesterId } });
+    const reqIdStr = requesterId.toString();
+    const recIdStr = recipientId.toString();
+    
+    console.log(`Notifying connection request: req=${reqIdStr}, rec=${recIdStr}`);
+    
+    const requester = await this.usersRepository.findOne({ where: { id: reqIdStr } });
     if (requester) {
-      this.messagingGateway.notifyConnectionRequest(recipientId, requester);
+      this.messagingGateway.notifyConnectionRequest(recIdStr, requester);
     }
 
     return saved;
@@ -100,8 +105,8 @@ export class ConnectionsService {
 
     // Recipient can respond to PENDING
     // Requester can withdraw PENDING
-    const isRecipient = connection.recipientId === userId;
-    const isRequester = connection.requesterId === userId;
+    const isRecipient = connection.recipientId.toString() === userId.toString();
+    const isRequester = connection.requesterId.toString() === userId.toString();
 
     if (!isRecipient && !isRequester) {
       throw new BadRequestException('You are not part of this connection');
