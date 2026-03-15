@@ -74,7 +74,7 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @SubscribeMessage('typing_status')
-  handleTyping(
+  async handleTyping(
     @MessageBody() data: { chatId: string; recipientId: string; isTyping: boolean },
     @ConnectedSocket() client: Socket,
   ) {
@@ -87,6 +87,14 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
       senderId,
       isTyping: data.isTyping,
     });
+  }
+
+  @SubscribeMessage('heartbeat')
+  async handleHeartbeat(@ConnectedSocket() client: Socket) {
+    if (client.data.user) {
+      const userId = client.data.user.sub.toString();
+      await this.usersService.updateLastSeen(userId);
+    }
   }
   
   notifyConnectionRequest(recipientId: string, requester: any) {
