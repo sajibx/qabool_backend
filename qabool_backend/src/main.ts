@@ -21,9 +21,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
+  // Static assets are handled via ServeStaticModule in AppModule
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

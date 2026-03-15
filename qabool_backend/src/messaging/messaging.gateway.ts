@@ -67,4 +67,22 @@ export class MessagingGateway implements OnGatewayConnection {
       isTyping: data.isTyping,
     });
   }
+  
+  notifyConnectionRequest(recipientId: string, requester: any) {
+    this.server.to(`user_${recipientId}`).emit('new_connection_request', {
+      requester,
+      message: `${requester.firstName} sent you a connection request`,
+    });
+  }
+
+  notifyNewFavorite(targetId: string, fromUser: any) {
+    this.server.to(`user_${targetId}`).emit('new_favorite', {
+      from: {
+        id: fromUser.id,
+        firstName: fromUser.firstName,
+        lastName: fromUser.lastName,
+        profileImageUrl: fromUser.profileImageUrl,
+      },
+    });
+  }
 }

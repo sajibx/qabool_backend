@@ -100,6 +100,25 @@ export class User {
   public isOnline?: boolean;
 
   @ApiProperty()
+  public get age(): number | null {
+    if (!this.dob) return null;
+    const today = new Date();
+    const birthDate = new Date(this.dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  @ApiProperty()
+  public connectionStatus?: 'PENDING_SENT' | 'PENDING_RECEIVED' | 'ACCEPTED' | 'REJECTED' | 'NONE';
+
+  @ApiProperty()
+  public connectionId?: string;
+
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 

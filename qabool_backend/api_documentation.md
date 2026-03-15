@@ -108,6 +108,24 @@ Returns the full User object of the authenticated user.
 }
 ```
 
+### Get Profile Details
+`GET /profiles/:id`
+
+**Response (200 OK):**
+```json
+{
+  "id": "uuid",
+  "firstName": "...",
+  "connectionStatus": "PENDING_SENT", 
+  "connectionId": "match-uuid",
+  "isFavorited": true,
+  "isOnline": true,
+  "lastSeen": "..."
+}
+```
+> [!NOTE]
+> All user profile responses (`/profiles`, `/profiles/:id`, `/favorites/my`, etc.) now include `connectionStatus` (relative to the logged-in user) and `connectionId`.
+
 ---
 
 ## 3. Connections (Matches)
@@ -147,6 +165,9 @@ Returns the full User object of the authenticated user.
 }
 ```
 *Status options: `ACCEPTED`, `REJECTED`*
+
+> [!IMPORTANT]
+> **Retry Logic**: If a request is `REJECTED` (or withdrawn by the requester using the same endpoint), the backend **deletes** the connection record. This resets the `connectionStatus` to `NONE` for both users, allowing a new request to be sent in the future.
 
 ---
 

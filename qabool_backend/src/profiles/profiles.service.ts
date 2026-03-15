@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Connection, ConnectionStatus } from '../connections/connection.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FavoritesService } from '../favorites/favorites.service';
 
@@ -10,8 +11,52 @@ export class ProfilesService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Connection)
+    private connectionsRepository: Repository<Connection>,
     private favoritesService: FavoritesService,
   ) {}
+
+  async populateUserExtraFields(user: User, currentUser: User): Promise<User> {
+    user.isFavorited = await this.favoritesService.isFavorite(currentUser.id, user.id);
+    
+    // Calculate isOnline (last 5 minutes)
+    if (user.lastSeen) {
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+      user.isOnline = user.lastSeen > fiveMinutesAgo;
+    } else {
+      user.isOnline = false;
+    }
+
+    // Connection Status
+    const connection = await this.connectionsRepository.findOne({
+      where: [
+        { requesterId: currentUser.id, recipientId: user.id },
+        { requesterId: user.id, recipientId: currentUser.id },
+      ],
+    });
+
+    if (connection) {
+      if (connection.status === ConnectionStatus.ACCEPTED) {
+        user.connectionStatus = 'ACCEPTED';
+      } else if (connection.status === ConnectionStatus.REJECTED) {
+        user.connectionStatus = 'NONE';
+      } else if (connection.status === ConnectionStatus.PENDING) {
+        if (connection.requesterId === currentUser.id) {
+          user.connectionStatus = 'PENDING_SENT';
+        } else {
+          user.connectionStatus = 'PENDING_RECEIVED';
+        }
+      } else {
+        user.connectionStatus = 'NONE';
+      }
+      user.connectionId = connection.id;
+    } else {
+      user.connectionStatus = 'NONE';
+      user.connectionId = undefined;
+    }
+
+    return user;
+  }
 
   async findAll(
     filters: { religion?: string; region?: string; ageMin?: number; ageMax?: number; gender?: string },
@@ -47,19 +92,7 @@ export class ProfilesService {
 
     if (currentUser.id) {
       for (const user of users) {
-        user.isFavorited = await this.favoritesService.isFavorite(currentUser.id, user.id);
-        
-        // Calculate isOnline (last 5 minutes)
-        if (user.lastSeen) {
-          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-          user.isOnline = user.lastSeen > fiveMinutesAgo;
-        } else {
-          user.isOnline = false;
-        }
-
-        if (user.isFavorited) {
-          console.log(`User ${currentUser.id} has favorited ${user.id} (Found in list)`);
-        }
+        await this.populateUserExtraFields(user, currentUser);
       }
     }
 
@@ -73,16 +106,16 @@ export class ProfilesService {
     }
 
     if (currentUserId) {
-      user.isFavorited = await this.favoritesService.isFavorite(currentUserId, user.id);
-      console.log(`Checking if ${currentUserId} favorited ${user.id}: ${user.isFavorited}`);
-    }
-
-    // Calculate isOnline
-    if (user.lastSeen) {
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      user.isOnline = user.lastSeen > fiveMinutesAgo;
+      const currentUser = await this.usersRepository.findOne({ where: { id: currentUserId } });
+      if (currentUser) {
+        await this.populateUserExtraFields(user, currentUser);
+      } else {
+        user.connectionStatus = 'NONE';
+        user.isFavorited = false;
+      }
     } else {
-      user.isOnline = false;
+      user.connectionStatus = 'NONE';
+      user.isFavorited = false;
     }
 
     return user;
