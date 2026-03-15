@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, UseGuards, Query } from '@nestjs/co
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { MessagingService } from './messaging.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { MessagingGateway } from './messaging.gateway';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from '../users/user.entity';
 
@@ -10,7 +11,10 @@ import { User } from '../users/user.entity';
 @UseGuards(JwtAuthGuard)
 @Controller('chats')
 export class MessagingController {
-  constructor(private readonly messagingService: MessagingService) {}
+  constructor(
+    private readonly messagingService: MessagingService,
+    private readonly messagingGateway: MessagingGateway,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List recent conversations' })
@@ -32,6 +36,17 @@ export class MessagingController {
   @ApiOperation({ summary: 'Mark messages in a chat as read' })
   async markAsRead(@GetUser() user: User, @Param('id') id: string) {
     await this.messagingService.markAsRead(id, user.id);
+    
+    // Find other participant to notify
+    const chats = await this.messagingService.findUserChats(user.id);
+    const chat = chats.find(c => c.id === id);
+    if (chat && chat.participants) {
+      const otherUser = chat.participants.find(p => p.id !== user.id);
+      if (otherUser) {
+        this.messagingGateway.notifyMessagesRead(id, user.id, otherUser.id);
+      }
+    }
+    
     return { success: true };
   }
 

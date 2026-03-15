@@ -61,10 +61,19 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     @ConnectedSocket() client: Socket,
   ) {
     const senderId = client.data.user.sub.toString();
-    const recipientId = data.recipientId.toString();
+    const recipientId = data.recipientId?.toString();
+    
+    console.log(`[send_message] senderId: ${senderId}, recipientId: ${recipientId}, chatId: ${data.chatId}`);
+
+    if (!recipientId) {
+      console.error(`[send_message] Missing recipientId for sender ${senderId}`);
+      return;
+    }
     
     await this.usersService.updateLastSeen(senderId);
     const message = await this.messagingService.saveMessage(data.chatId, senderId, data.content, data.type);
+    
+    console.log(`[send_message] Message saved. Emitting to user_${senderId} and user_${recipientId}`);
     
     // Emit to both parties
     this.server.to(`user_${senderId}`).emit('new_message', message);
@@ -97,6 +106,13 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
   }
   
+  notifyMessagesRead(chatId: string, readerId: string, recipientId: string) {
+    this.server.to(`user_${recipientId}`).emit('messages_read', {
+      chatId,
+      readerId,
+    });
+  }
+
   notifyConnectionRequest(recipientId: string, requester: any) {
     this.server.to(`user_${recipientId}`).emit('new_connection_request', {
       requester,
