@@ -28,32 +28,45 @@ export class ProfilesService {
     }
 
     // Connection Status
-    const connection = await this.connectionsRepository.findOne({
-      where: [
-        { requesterId: currentUser.id, recipientId: user.id },
-        { requesterId: user.id, recipientId: currentUser.id },
-      ],
-    });
+    const currentId = currentUser.id?.toString();
+    const targetId = user.id?.toString();
 
-    if (connection) {
-      if (connection.status === ConnectionStatus.ACCEPTED) {
-        user.connectionStatus = 'ACCEPTED';
-      } else if (connection.status === ConnectionStatus.REJECTED) {
-        user.connectionStatus = 'NONE';
-      } else if (connection.status === ConnectionStatus.PENDING) {
-        if (connection.requesterId === currentUser.id) {
-          user.connectionStatus = 'PENDING_SENT';
+    if (currentId && targetId) {
+      const connection = await this.connectionsRepository.findOne({
+        where: [
+          { requesterId: currentId, recipientId: targetId },
+          { requesterId: targetId, recipientId: currentId },
+        ],
+      });
+
+      console.log(`Checking connection between ${currentUser.email} (${currentId}) and ${user.email} (${targetId})`);
+      if (connection) {
+        console.log(`Connection found: status=${connection.status}, requesterId=${connection.requesterId}`);
+        const requesterId = connection.requesterId.toString();
+        
+        if (connection.status === ConnectionStatus.ACCEPTED) {
+          user.connectionStatus = 'ACCEPTED';
+        } else if (connection.status === ConnectionStatus.REJECTED) {
+          user.connectionStatus = 'NONE';
+        } else if (connection.status === ConnectionStatus.PENDING) {
+          if (requesterId === currentId) {
+            user.connectionStatus = 'PENDING_SENT';
+          } else {
+            user.connectionStatus = 'PENDING_RECEIVED';
+          }
         } else {
-          user.connectionStatus = 'PENDING_RECEIVED';
+          user.connectionStatus = 'NONE';
         }
+        user.connectionId = connection.id;
       } else {
+        console.log('No connection found');
         user.connectionStatus = 'NONE';
+        user.connectionId = undefined;
       }
-      user.connectionId = connection.id;
     } else {
       user.connectionStatus = 'NONE';
-      user.connectionId = undefined;
     }
+    console.log(`Set connectionStatus=${user.connectionStatus}`);
 
     return user;
   }
