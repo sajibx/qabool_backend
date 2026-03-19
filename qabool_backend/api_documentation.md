@@ -127,6 +127,15 @@ Returns the full User object of the authenticated user.
   "lastSeen": "..."
 }
 ```
+
+### Discover Users (Authenticated)
+`GET /profiles/discover`
+
+**Description**: returns all active users in the system. This endpoint is a placeholder for future discovery algorithms.
+
+**Response (200 OK):**
+Returns a list of User objects.
+
 > [!NOTE]
 > All user profile responses (`/profiles`, `/profiles/:id`, `/favorites/my`, etc.) now include `connectionStatus` (relative to the logged-in user) and `connectionId`.
 

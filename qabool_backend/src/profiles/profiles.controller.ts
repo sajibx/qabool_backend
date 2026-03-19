@@ -63,6 +63,12 @@ export class ProfilesController {
     return this.profilesService.update(user.id, updateProfileDto, profileImagePath);
   }
 
+  @Get('discover')
+  @ApiOperation({ summary: 'Discover new users' })
+  async discover(@GetUser() user: User) {
+    return this.profilesService.discover(user);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get profile by ID' })
   async findOne(@GetUser() user: User, @Param('id') id: string) {

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User, UserStatus } from '../users/user.entity';
 import { Connection, ConnectionStatus } from '../connections/connection.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FavoritesService } from '../favorites/favorites.service';
@@ -112,6 +112,18 @@ export class ProfilesService {
       for (const user of users) {
         await this.populateUserExtraFields(user, currentUser);
       }
+    }
+
+    return users;
+  }
+
+  async discover(currentUser: User): Promise<User[]> {
+    const users = await this.usersRepository.find({
+      where: { status: UserStatus.ACTIVE },
+    });
+
+    for (const user of users) {
+      await this.populateUserExtraFields(user, currentUser);
     }
 
     return users;
