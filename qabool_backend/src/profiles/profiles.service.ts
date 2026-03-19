@@ -101,6 +101,11 @@ export class ProfilesService {
       query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
 
+    // Past Issues Filtering
+    if (currentUser.hasPastIssues === false && currentUser.acceptsPastIssues === false) {
+      query.andWhere('user.hasPastIssues = :hasPastIssues', { hasPastIssues: false });
+    }
+
     const users = await query.getMany();
 
     if (currentUser.id) {

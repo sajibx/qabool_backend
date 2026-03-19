@@ -43,6 +43,8 @@ export class AuthService {
         profession: registerDto.profession,
         education: registerDto.education,
         specialConsiderations: registerDto.specialConsiderations,
+        hasPastIssues: registerDto.hasPastIssues,
+        acceptsPastIssues: registerDto.acceptsPastIssues,
         profileImageUrl: profileImageUrl as string,
         dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
       });

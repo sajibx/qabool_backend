@@ -64,7 +64,7 @@ export class RegisterDto {
   @IsString()
   bio?: string;
 
-  @ApiProperty({ example: 'N/A', required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   specialConsiderations?: string;
@@ -73,4 +73,12 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   region?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hasPastIssues?: boolean;
+
+  @ApiProperty({ example: false, required: false })
+  @IsOptional()
+  acceptsPastIssues?: boolean;
 }

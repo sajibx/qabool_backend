@@ -72,4 +72,12 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   specialConsiderations?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  hasPastIssues?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  acceptsPastIssues?: boolean;
 }

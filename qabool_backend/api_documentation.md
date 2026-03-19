@@ -23,7 +23,9 @@ This document provides all the necessary details to integrate the Qabool backend
   "email": "user@example.com",
   "password": "password123",
   "firstName": "John",
-  "lastName": "Doe"
+  "lastName": "Doe",
+  "hasPastIssues": false,
+  "acceptsPastIssues": true
 }
 ```
 
@@ -104,7 +106,9 @@ Returns the full User object of the authenticated user.
   "religion": "Islam (Shia)",
   "education": "Master's in Engineering",
   "dob": "1995-05-15",
-  "gender": "FEMALE"
+  "gender": "FEMALE",
+  "hasPastIssues": true,
+  "acceptsPastIssues": false
 }
 ```
 

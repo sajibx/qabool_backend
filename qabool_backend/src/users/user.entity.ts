@@ -88,6 +88,14 @@ export class User {
   @ApiProperty()
   @Column({ default: false })
   isVerified: boolean;
+  
+  @ApiProperty()
+  @Column({ default: false })
+  hasPastIssues: boolean;
+
+  @ApiProperty()
+  @Column({ default: false })
+  acceptsPastIssues: boolean;
 
   @ApiProperty()
   @Column({ nullable: true })
