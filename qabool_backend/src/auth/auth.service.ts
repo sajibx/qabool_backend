@@ -45,6 +45,7 @@ export class AuthService {
         specialConsiderations: registerDto.specialConsiderations,
         hasPastIssues: registerDto.hasPastIssues,
         acceptsPastIssues: registerDto.acceptsPastIssues,
+        phoneNumber: registerDto.phoneNumber,
         profileImageUrl: profileImageUrl as string,
         dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
       });

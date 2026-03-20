@@ -81,4 +81,9 @@ export class RegisterDto {
   @ApiProperty({ example: false, required: false })
   @IsOptional()
   acceptsPastIssues?: boolean;
+
+  @ApiProperty({ example: '+1234567890', required: false })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
 }

@@ -99,6 +99,10 @@ export class User {
 
   @ApiProperty()
   @Column({ nullable: true })
+  phoneNumber: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
   lastSeen: Date;
 
   @ApiProperty()

@@ -24,6 +24,7 @@ This document provides all the necessary details to integrate the Qabool backend
   "password": "password123",
   "firstName": "John",
   "lastName": "Doe",
+  "phoneNumber": "+1234567890",
   "hasPastIssues": false,
   "acceptsPastIssues": true
 }
