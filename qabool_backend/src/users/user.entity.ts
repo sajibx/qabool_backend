@@ -50,7 +50,7 @@ export class User {
   gender: string;
 
   @ApiProperty()
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.INACTIVE })
+  @Column({ enum: UserStatus, default: UserStatus.INACTIVE })
   status: UserStatus;
 
   @ApiProperty()

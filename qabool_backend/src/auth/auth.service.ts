@@ -64,20 +64,28 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+    console.log(`Login attempt for email: ${loginDto.email}`);
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
+      console.log(`User NOT found for email: ${loginDto.email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    console.log(`User found: ${user.email}, status: ${user.status}`);
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.passwordHash);
+    console.log(`Is password valid: ${isPasswordValid}`);
+    
     if (!isPasswordValid) {
+      console.log(`Invalid password for user: ${loginDto.email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 
     if (user.status !== UserStatus.ACTIVE) {
+      console.log(`User account NOT active: ${user.status}`);
       throw new UnauthorizedException('Your account is pending admin approval');
     }
 
+    console.log(`Login successful for user: ${loginDto.email}`);
     const payload = { sub: user.id, email: user.email };
     return {
       access_token: this.jwtService.sign(payload),

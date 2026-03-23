@@ -23,7 +23,7 @@ export class Connection {
   recipientId: string;
 
   @ApiProperty({ enum: ConnectionStatus })
-  @Column({ type: 'enum', enum: ConnectionStatus, default: ConnectionStatus.PENDING })
+  @Column({ enum: ConnectionStatus, default: ConnectionStatus.PENDING })
   status: ConnectionStatus;
 
   @ApiProperty()

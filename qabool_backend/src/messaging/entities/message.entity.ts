@@ -33,11 +33,11 @@ export class Message {
   content: string;
 
   @ApiProperty({ enum: MessageType })
-  @Column({ type: 'enum', enum: MessageType, default: MessageType.TEXT })
+  @Column({ enum: MessageType, default: MessageType.TEXT })
   type: MessageType;
 
   @ApiProperty({ enum: MessageStatus })
-  @Column({ type: 'enum', enum: MessageStatus, default: MessageStatus.SENT })
+  @Column({ enum: MessageStatus, default: MessageStatus.SENT })
   status: MessageStatus;
 
   @ApiProperty()
