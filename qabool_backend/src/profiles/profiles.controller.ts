@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, Param, UseGuards, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, UseGuards, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -67,6 +67,44 @@ export class ProfilesController {
   @ApiOperation({ summary: 'Discover new users' })
   async discover(@GetUser() user: User) {
     return this.profilesService.discover(user);
+  }
+
+  @Get('home')
+  @ApiOperation({ summary: 'Get home feed (not connected, not skipped)' })
+  async getHome(@GetUser() user: User) {
+    return this.profilesService.getHomeProfiles(user);
+  }
+
+  @Get('explore/:includeConnected/:includeSkipped')
+  @ApiOperation({ summary: 'Explore users with filters' })
+  async getExplore(
+    @GetUser() user: User,
+    @Param('includeConnected') includeConnected: string,
+    @Param('includeSkipped') includeSkipped: string,
+  ) {
+    return this.profilesService.getExploreProfiles(
+      user,
+      includeConnected === 'true',
+      includeSkipped === 'true',
+    );
+  }
+
+  @Get('skipped')
+  @ApiOperation({ summary: 'Get skipped users' })
+  async getSkipped(@GetUser() user: User) {
+    return this.profilesService.getSkippedUsers(user);
+  }
+
+  @Post(':id/skip')
+  @ApiOperation({ summary: 'Skip a user' })
+  async skip(@GetUser() user: User, @Param('id') id: string) {
+    return this.profilesService.skipUser(user.id, id);
+  }
+
+  @Delete(':id/skip')
+  @ApiOperation({ summary: 'Unskip a user' })
+  async unskip(@GetUser() user: User, @Param('id') id: string) {
+    return this.profilesService.unskipUser(user.id, id);
   }
 
   @Get(':id')

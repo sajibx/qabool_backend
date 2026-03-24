@@ -131,6 +131,9 @@ export class User {
   public connectionId?: string;
 
   @ApiProperty()
+  public isSkipped?: boolean;
+
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 

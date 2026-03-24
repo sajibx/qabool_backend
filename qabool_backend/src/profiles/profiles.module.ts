@@ -7,9 +7,11 @@ import { Connection } from '../connections/connection.entity';
 import { FavoritesModule } from '../favorites/favorites.module';
 import { ConnectionsModule } from '../connections/connections.module';
 
+import { SkippedUser } from './entities/skipped-user.entity';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Connection]),
+    TypeOrmModule.forFeature([User, Connection, SkippedUser]),
     forwardRef(() => FavoritesModule),
     forwardRef(() => ConnectionsModule),
   ],

@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { User, UserStatus } from '../users/user.entity';
 import { Connection, ConnectionStatus } from '../connections/connection.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FavoritesService } from '../favorites/favorites.service';
+
+import { SkippedUser } from './entities/skipped-user.entity';
 
 @Injectable()
 export class ProfilesService {
@@ -13,12 +15,20 @@ export class ProfilesService {
     private usersRepository: Repository<User>,
     @InjectRepository(Connection)
     private connectionsRepository: Repository<Connection>,
+    @InjectRepository(SkippedUser)
+    private skippedUserRepository: Repository<SkippedUser>,
     private favoritesService: FavoritesService,
   ) {}
 
   async populateUserExtraFields(user: User, currentUser: User): Promise<User> {
     user.isFavorited = await this.favoritesService.isFavorite(currentUser.id, user.id);
     
+    // Check if skipped
+    const skipped = await this.skippedUserRepository.findOne({
+      where: { userId: currentUser.id, skippedUserId: user.id },
+    });
+    user.isSkipped = !!skipped;
+
     // Calculate isOnline (last 5 minutes)
     if (user.lastSeen) {
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -166,5 +176,126 @@ export class ProfilesService {
 
     Object.assign(user, updateData);
     return this.usersRepository.save(user);
+  }
+
+  async skipUser(userId: string, targetId: string): Promise<void> {
+    if (userId === targetId) return;
+    const existing = await this.skippedUserRepository.findOne({
+      where: { userId, skippedUserId: targetId },
+    });
+    if (!existing) {
+      const skip = this.skippedUserRepository.create({ userId, skippedUserId: targetId });
+      await this.skippedUserRepository.save(skip);
+    }
+  }
+
+  async unskipUser(userId: string, targetId: string): Promise<void> {
+    await this.skippedUserRepository.delete({ userId, skippedUserId: targetId });
+  }
+
+  async getSkippedUsers(currentUser: User): Promise<User[]> {
+    const skips = await this.skippedUserRepository.find({
+      where: { userId: currentUser.id },
+    });
+    const skippedIds = skips.map((s) => s.skippedUserId);
+    if (skippedIds.length === 0) return [];
+
+    const users = await this.usersRepository.find({
+      where: { id: In(skippedIds) },
+    });
+
+    for (const user of users) {
+      await this.populateUserExtraFields(user, currentUser);
+    }
+    return users;
+  }
+
+  async getHomeProfiles(currentUser: User): Promise<User[]> {
+    // 1. Get all active users except current user
+    const query = this.usersRepository.createQueryBuilder('user')
+      .where('user.status = :status', { status: UserStatus.ACTIVE })
+      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
+
+    // 2. Gender filter
+    let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
+    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+
+    // 3. Filter out connected users (only ACCEPTED status)
+    const connectedQuery = this.connectionsRepository.createQueryBuilder('conn')
+      .select('CASE WHEN conn.requesterId = :myId THEN conn.recipientId ELSE conn.requesterId END', 'userId')
+      .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
+      .andWhere('conn.status = :accepted', { accepted: ConnectionStatus.ACCEPTED })
+      .setParameters({ myId: currentUser.id });
+    
+    const connectedUsers = await connectedQuery.getRawMany();
+    const connectedIds = connectedUsers.map(u => u.userId);
+
+    if (connectedIds.length > 0) {
+      query.andWhere('user.id NOT IN (:...connectedIds)', { connectedIds });
+    }
+
+    // 4. Filter out skipped users
+    const skippedQuery = this.skippedUserRepository.createQueryBuilder('skip')
+      .select('skip.skippedUserId', 'userId')
+      .where('skip.userId = :myId', { myId: currentUser.id });
+    
+    const skippedUsers = await skippedQuery.getRawMany();
+    const skippedIds = skippedUsers.map(u => u.userId);
+
+    if (skippedIds.length > 0) {
+      query.andWhere('user.id NOT IN (:...skippedIds)', { skippedIds });
+    }
+
+    const users = await query.getMany();
+    for (const user of users) {
+      await this.populateUserExtraFields(user, currentUser);
+    }
+    return users;
+  }
+
+  async getExploreProfiles(currentUser: User, includeConnected: boolean, includeSkipped: boolean): Promise<User[]> {
+    const query = this.usersRepository.createQueryBuilder('user')
+      .where('user.status = :status', { status: UserStatus.ACTIVE })
+      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
+
+    // Gender filter
+    let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
+    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+
+    // Filter connected
+    if (!includeConnected) {
+      const connectedQuery = this.connectionsRepository.createQueryBuilder('conn')
+        .select('CASE WHEN conn.requesterId = :myId THEN conn.recipientId ELSE conn.requesterId END', 'userId')
+        .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
+        .andWhere('conn.status = :accepted', { accepted: ConnectionStatus.ACCEPTED })
+        .setParameters({ myId: currentUser.id });
+      
+      const connectedUsers = await connectedQuery.getRawMany();
+      const connectedIds = connectedUsers.map(u => u.userId);
+
+      if (connectedIds.length > 0) {
+        query.andWhere('user.id NOT IN (:...connectedIds)', { connectedIds });
+      }
+    }
+
+    // Filter skipped
+    if (!includeSkipped) {
+      const skippedQuery = this.skippedUserRepository.createQueryBuilder('skip')
+        .select('skip.skippedUserId', 'userId')
+        .where('skip.userId = :myId', { myId: currentUser.id });
+      
+      const skippedUsers = await skippedQuery.getRawMany();
+      const skippedIds = skippedUsers.map(u => u.userId);
+
+      if (skippedIds.length > 0) {
+        query.andWhere('user.id NOT IN (:...skippedIds)', { skippedIds });
+      }
+    }
+
+    const users = await query.getMany();
+    for (const user of users) {
+      await this.populateUserExtraFields(user, currentUser);
+    }
+    return users;
   }
 }
