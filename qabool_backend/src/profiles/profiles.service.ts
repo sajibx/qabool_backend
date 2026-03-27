@@ -310,7 +310,7 @@ export class ProfilesService {
   async getExploreProfiles(currentUser: User, includeConnected: boolean, includeSkipped: boolean): Promise<User[]> {
     const query = this.usersRepository.createQueryBuilder('user')
       .where('user.status = :status', { status: UserStatus.ACTIVE })
-      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
+      .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id }).orderBy('RANDOM()');
 
     // Gender filter
     let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
