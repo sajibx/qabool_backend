@@ -120,4 +120,9 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   lookingForProfession?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
 }
