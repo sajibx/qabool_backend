@@ -109,16 +109,35 @@ Returns the full User object of the authenticated user.
 ### Update My Profile
 `PUT /profiles/me`
 
-**Request Body:**
+**Request Body (Multipart/form-data or JSON):**
 ```json
 {
+  "email": "new.email@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
   "bio": "New bio content",
-  "religion": "Islam (Shia)",
-  "education": "Master's in Engineering",
   "dob": "1995-05-15",
   "gender": "FEMALE",
-  "hasPastIssues": true,
-  "acceptsPastIssues": false
+  "region": "London",
+  "religion": "Islam (Sunni)",
+  "ethnicity": "Arab",
+  "height": 175,
+  "weight": 70,
+  "maritalStatus": "Single",
+  "currentCity": "New York",
+  "monthlyIncome": 6000,
+  "siblings": 3,
+  "familyMembers": 5,
+  "lookingForAge": "20-30",
+  "lookingForType": "Practising",
+  "lookingForProfession": "Engineer",
+  "profession": "Doctor",
+  "education": "Master's Degree",
+  "specialConsiderations": "None",
+  "hasPastIssues": false,
+  "acceptsPastIssues": true,
+  "phoneNumber": "+1234567890",
+  "profileImage": "(File upload allowed via multipart)"
 }
 ```
 

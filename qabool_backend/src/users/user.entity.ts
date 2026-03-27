@@ -139,8 +139,8 @@ export class User {
   acceptsPastIssues: boolean;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  phoneNumber: string;
+  @Column({ type: 'varchar', unique: true, nullable: true })
+  phoneNumber: string | null;
 
   @ApiProperty()
   @Column({ nullable: true })

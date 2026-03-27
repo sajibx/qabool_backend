@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { User, UserStatus } from '../users/user.entity';
@@ -8,6 +8,8 @@ import { FavoritesService } from '../favorites/favorites.service';
 import { BlockingService } from '../users/blocking.service';
 
 import { SkippedUser } from './entities/skipped-user.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ProfilesService {
@@ -20,11 +22,11 @@ export class ProfilesService {
     private skippedUserRepository: Repository<SkippedUser>,
     private favoritesService: FavoritesService,
     private blockingService: BlockingService,
-  ) {}
+  ) { }
 
   async populateUserExtraFields(user: User, currentUser: User): Promise<User> {
     user.isFavorited = await this.favoritesService.isFavorite(currentUser.id, user.id);
-    
+
     // Check if skipped
     const skipped = await this.skippedUserRepository.findOne({
       where: { userId: currentUser.id, skippedUserId: user.id },
@@ -55,7 +57,7 @@ export class ProfilesService {
       if (connection) {
         console.log(`Connection found: status=${connection.status}, requesterId=${connection.requesterId}`);
         const requesterId = connection.requesterId.toString();
-        
+
         if (connection.status === ConnectionStatus.ACCEPTED) {
           user.connectionStatus = 'ACCEPTED';
         } else if (connection.status === ConnectionStatus.REJECTED) {
@@ -114,7 +116,7 @@ export class ProfilesService {
     if (filters.religion) {
       query.andWhere('user.religion LIKE :religion', { religion: `%${filters.religion}%` });
     }
- 
+
     if (filters.region) {
       query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
@@ -176,11 +178,43 @@ export class ProfilesService {
   }
 
   async update(id: string, updateProfileDto: UpdateProfileDto, profileImagePath?: string): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.findOne(id, id);
+
+    // Check email uniqueness if it's being updated
+    if (updateProfileDto.email && updateProfileDto.email !== user.email) {
+      const existingUser = await this.usersRepository.findOne({
+        where: { email: updateProfileDto.email },
+      });
+      if (existingUser && existingUser.id !== id) {
+        throw new ConflictException('Email already exists');
+      }
+    }
+
+    // Check phone number uniqueness if it's being updated
+    if (updateProfileDto.phoneNumber && updateProfileDto.phoneNumber !== user.phoneNumber) {
+      const existingUser = await this.usersRepository.findOne({
+        where: { phoneNumber: updateProfileDto.phoneNumber },
+      });
+      if (existingUser && existingUser.id !== id) {
+        throw new ConflictException('Phone number already exists');
+      }
+    }
     
     const updateData: any = { ...updateProfileDto };
 
     if (profileImagePath) {
+      // Delete old image if it exists
+      if (user.profileImageUrl) {
+        const relativeOldPath = user.profileImageUrl.startsWith('/') ? user.profileImageUrl.substring(1) : user.profileImageUrl;
+        const oldImagePath = path.join(process.cwd(), relativeOldPath);
+        if (fs.existsSync(oldImagePath)) {
+          try {
+            fs.unlinkSync(oldImagePath);
+          } catch (err) {
+            console.error(`Failed to delete old profile image: ${oldImagePath}`, err);
+          }
+        }
+      }
       updateData.profileImageUrl = `/${profileImagePath.replace(/\\/g, '/')}`;
     }
 
@@ -240,7 +274,7 @@ export class ProfilesService {
       .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
       .andWhere('conn.status = :accepted', { accepted: ConnectionStatus.ACCEPTED })
       .setParameters({ myId: currentUser.id });
-    
+
     const connectedUsers = await connectedQuery.getRawMany();
     const connectedIds = connectedUsers.map(u => u.userId);
 
@@ -252,7 +286,7 @@ export class ProfilesService {
     const skippedQuery = this.skippedUserRepository.createQueryBuilder('skip')
       .select('skip.skippedUserId', 'userId')
       .where('skip.userId = :myId', { myId: currentUser.id });
-    
+
     const skippedUsers = await skippedQuery.getRawMany();
     const skippedIds = skippedUsers.map(u => u.userId);
 
@@ -289,7 +323,7 @@ export class ProfilesService {
         .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
         .andWhere('conn.status = :accepted', { accepted: ConnectionStatus.ACCEPTED })
         .setParameters({ myId: currentUser.id });
-      
+
       const connectedUsers = await connectedQuery.getRawMany();
       const connectedIds = connectedUsers.map(u => u.userId);
 
@@ -303,7 +337,7 @@ export class ProfilesService {
       const skippedQuery = this.skippedUserRepository.createQueryBuilder('skip')
         .select('skip.skippedUserId', 'userId')
         .where('skip.userId = :myId', { myId: currentUser.id });
-      
+
       const skippedUsers = await skippedQuery.getRawMany();
       const skippedIds = skippedUsers.map(u => u.userId);
 

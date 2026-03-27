@@ -1,8 +1,14 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, MaxLength, IsEmail, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '../../users/user.entity';
+import { Transform, Type } from 'class-transformer';
 
 export class UpdateProfileDto {
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
@@ -50,11 +56,13 @@ export class UpdateProfileDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   height?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   weight?: number;
 
@@ -75,10 +83,14 @@ export class UpdateProfileDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   hasPastIssues?: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   acceptsPastIssues?: boolean;
 
   @ApiProperty({ required: false })
@@ -93,16 +105,19 @@ export class UpdateProfileDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   monthlyIncome?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   siblings?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   familyMembers?: number;
 
