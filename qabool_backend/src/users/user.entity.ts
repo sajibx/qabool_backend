@@ -12,6 +12,11 @@ export enum UserStatus {
   INACTIVE = 'INACTIVE',
 }
 
+export enum VerifiedStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
 @Entity('users')
 export class User {
   @ApiProperty()
@@ -72,6 +77,42 @@ export class User {
   @ApiProperty()
   @Column({ type: 'float', nullable: true })
   weight: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  maritalStatus: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  currentCity: string;
+
+  @ApiProperty()
+  @Column({ type: 'float', nullable: true })
+  monthlyIncome: number;
+
+  @ApiProperty()
+  @Column({ type: 'int', nullable: true })
+  siblings: number;
+
+  @ApiProperty()
+  @Column({ type: 'int', nullable: true })
+  familyMembers: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  lookingForAge: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  lookingForType: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  lookingForProfession: string;
+
+  @ApiProperty()
+  @Column({ enum: VerifiedStatus, default: VerifiedStatus.INACTIVE })
+  verifiedStatus: VerifiedStatus;
 
   @ApiProperty()
   @Column({ nullable: true })

@@ -86,4 +86,41 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   phoneNumber?: string;
+
+  @ApiProperty({ example: 'Single', required: false })
+  @IsOptional()
+  @IsString()
+  maritalStatus?: string;
+
+  @ApiProperty({ example: 'New York', required: false })
+  @IsOptional()
+  @IsString()
+  currentCity?: string;
+
+  @ApiProperty({ example: 5000, required: false })
+  @IsOptional()
+  monthlyIncome?: number;
+
+  @ApiProperty({ example: 2, required: false })
+  @IsOptional()
+  siblings?: number;
+
+  @ApiProperty({ example: 4, required: false })
+  @IsOptional()
+  familyMembers?: number;
+
+  @ApiProperty({ example: '25-30', required: false })
+  @IsOptional()
+  @IsString()
+  lookingForAge?: string;
+
+  @ApiProperty({ example: 'Religious', required: false })
+  @IsOptional()
+  @IsString()
+  lookingForType?: string;
+
+  @ApiProperty({ example: 'Doctor', required: false })
+  @IsOptional()
+  @IsString()
+  lookingForProfession?: string;
 }

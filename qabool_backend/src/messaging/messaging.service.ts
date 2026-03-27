@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Chat } from './entities/chat.entity';
 import { Message, MessageType, MessageStatus } from './entities/message.entity';
 import { User } from '../users/user.entity';
 import { Not } from 'typeorm';
+import { BlockingService } from '../users/blocking.service';
 
 @Injectable()
 export class MessagingService {
@@ -15,6 +16,7 @@ export class MessagingService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private blockingService: BlockingService,
   ) {}
 
   async findUserChats(userId: string) {
@@ -26,8 +28,17 @@ export class MessagingService {
       .orderBy('messages.createdAt', 'DESC')
       .getMany();
 
-    // Deduplicate chats (QueryBuilder with innerJoin on messages might return same chat multiple times)
-    const uniqueChats = Array.from(new Map(chats.map(chat => [chat.id, chat])).values());
+    // Deduplicate chats
+    let uniqueChats = Array.from(new Map(chats.map(chat => [chat.id, chat])).values());
+
+    // Blocking filter: Remove chats with blocked users
+    const blockedIds = await this.blockingService.getBlockedUserIds(userId);
+    if (blockedIds.length > 0) {
+      uniqueChats = uniqueChats.filter(chat => {
+        const otherParticipants = chat.participants.filter(p => p.id !== userId);
+        return !otherParticipants.some(p => blockedIds.includes(p.id));
+      });
+    }
 
     return Promise.all(uniqueChats.map(async (chat) => {
       // Sort messages by creation date to ensure lastMessage is correct
@@ -105,6 +116,13 @@ export class MessagingService {
     const participants = await this.usersRepository.find({
       where: { id: In(participantIds) },
     });
+
+    if (participantIds.length === 2) {
+      const isBlocked = await this.blockingService.isBlocked(participantIds[0], participantIds[1]);
+      if (isBlocked) {
+        throw new ConflictException('Cannot create chat: User is blocked');
+      }
+    }
     
     const chat = this.chatsRepository.create({ participants });
     return this.chatsRepository.save(chat);

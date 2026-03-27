@@ -6,6 +6,7 @@ import { User } from '../users/user.entity';
 import { Connection } from '../connections/connection.entity';
 import { FavoritesModule } from '../favorites/favorites.module';
 import { ConnectionsModule } from '../connections/connections.module';
+import { UsersModule } from '../users/users.module';
 
 import { SkippedUser } from './entities/skipped-user.entity';
 
@@ -14,6 +15,7 @@ import { SkippedUser } from './entities/skipped-user.entity';
     TypeOrmModule.forFeature([User, Connection, SkippedUser]),
     forwardRef(() => FavoritesModule),
     forwardRef(() => ConnectionsModule),
+    UsersModule,
   ],
   providers: [ProfilesService],
   controllers: [ProfilesController],

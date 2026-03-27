@@ -5,6 +5,7 @@ import { User, UserStatus } from '../users/user.entity';
 import { Connection, ConnectionStatus } from '../connections/connection.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FavoritesService } from '../favorites/favorites.service';
+import { BlockingService } from '../users/blocking.service';
 
 import { SkippedUser } from './entities/skipped-user.entity';
 
@@ -18,6 +19,7 @@ export class ProfilesService {
     @InjectRepository(SkippedUser)
     private skippedUserRepository: Repository<SkippedUser>,
     private favoritesService: FavoritesService,
+    private blockingService: BlockingService,
   ) {}
 
   async populateUserExtraFields(user: User, currentUser: User): Promise<User> {
@@ -89,6 +91,12 @@ export class ProfilesService {
       .where('user.status = :status', { status: 'ACTIVE' })
       .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
 
+    // Blocking filter
+    const blockedIds = await this.blockingService.getBlockedUserIds(currentUser.id);
+    if (blockedIds.length > 0) {
+      query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
+    }
+
     // Determine target gender if not explicitly provided
     let targetGender = filters.gender;
     if (!targetGender) {
@@ -146,6 +154,12 @@ export class ProfilesService {
     }
 
     if (currentUserId) {
+      // Check if blocked
+      const isBlocked = await this.blockingService.isBlocked(currentUserId, id);
+      if (isBlocked) {
+        throw new NotFoundException('Profile not found');
+      }
+
       const currentUser = await this.usersRepository.findOne({ where: { id: currentUserId } });
       if (currentUser) {
         await this.populateUserExtraFields(user, currentUser);
@@ -246,6 +260,12 @@ export class ProfilesService {
       query.andWhere('user.id NOT IN (:...skippedIds)', { skippedIds });
     }
 
+    // Blocking filter
+    const blockedIds = await this.blockingService.getBlockedUserIds(currentUser.id);
+    if (blockedIds.length > 0) {
+      query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
+    }
+
     const users = await query.getMany();
     for (const user of users) {
       await this.populateUserExtraFields(user, currentUser);
@@ -290,6 +310,12 @@ export class ProfilesService {
       if (skippedIds.length > 0) {
         query.andWhere('user.id NOT IN (:...skippedIds)', { skippedIds });
       }
+    }
+
+    // Blocking filter
+    const blockedIds = await this.blockingService.getBlockedUserIds(currentUser.id);
+    if (blockedIds.length > 0) {
+      query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
     }
 
     const users = await query.getMany();

@@ -80,4 +80,44 @@ export class UpdateProfileDto {
   @ApiProperty({ required: false })
   @IsOptional()
   acceptsPastIssues?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  maritalStatus?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  currentCity?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  monthlyIncome?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  siblings?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  familyMembers?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForAge?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForType?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForProfession?: string;
 }

@@ -26,7 +26,15 @@ This document provides all the necessary details to integrate the Qabool backend
   "lastName": "Doe",
   "phoneNumber": "+1234567890",
   "hasPastIssues": false,
-  "acceptsPastIssues": true
+  "acceptsPastIssues": true,
+  "maritalStatus": "Single",
+  "currentCity": "New York",
+  "monthlyIncome": 5000,
+  "siblings": 2,
+  "familyMembers": 4,
+  "lookingForAge": "25-30",
+  "lookingForType": "Religious",
+  "lookingForProfession": "Doctor"
 }
 ```
 
@@ -42,6 +50,7 @@ This document provides all the necessary details to integrate the Qabool backend
     "firstName": "John",
     "lastName": "Doe",
     "status": "INACTIVE",
+    "verifiedStatus": "inactive",
     "profileImageUrl": "/uploads/random_profile_converted.jpg",
     "lastSeen": "2026-03-14T17:30:00Z",
     "isOnline": true
@@ -272,7 +281,26 @@ Returns a list of User objects.
   }
   ```
 
-1. **State Persistence**: Store the `access_token` securely (e.g., `flutter_secure_storage`).
-2. **Global Headers**: Attach the token to every request using an Interceptor (e.g., Dio Interceptor).
-3. **Real-time**: Use `socket_io_client` in Flutter. Connect when the app starts/user logs in and join the user room automatically handled by backend.
-4. **Validation**: The backend uses `class-validator`. If you send a bad request, it returns a 400 with a descriptive error array.
+---
+
+## 6. Blocking (Authenticated)
+
+### Block a User
+`POST /api/v1/blocks/:id`
+- Blocks the specified user.
+- Once blocked, neither user will see each other in discovery, search, or chat lists.
+- Existing chats are hidden.
+- New chats cannot be created between blocked users.
+
+### Unblock a User
+`DELETE /api/v1/blocks/:id`
+- Unblocks the specified user.
+- User becomes visible again in discovery and search.
+
+### List Blocked Users
+`GET /api/v1/blocks`
+- Returns a list of User objects you have blocked.
+
+---
+
+## 7. Implementation Notes (Frontend)
