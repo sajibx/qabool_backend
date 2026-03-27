@@ -190,20 +190,20 @@ export class ProfilesService {
       }
     }
 
-    console.log(`Updating user ${id}. Current phone: ${user.phoneNumber}, New phone: ${updateProfileDto.phoneNumber}`);
     // Check phone number uniqueness if it's being updated
     if (updateProfileDto.phoneNumber && updateProfileDto.phoneNumber !== user.phoneNumber) {
-      console.log(`Checking uniqueness for phone: ${updateProfileDto.phoneNumber}`);
       const existingUser = await this.usersRepository.findOne({
         where: { phoneNumber: updateProfileDto.phoneNumber },
       });
-      console.log(`Uniqueness check result: ${existingUser ? 'Found user ' + existingUser.id : 'No conflict found'}`);
       if (existingUser && existingUser.id !== id) {
         throw new ConflictException('Phone number already exists');
       }
     }
     
     const updateData: any = { ...updateProfileDto };
+
+    // Explicitly delete profileImageUrl from DTO to handle it separately
+    delete updateData.profileImageUrl;
 
     if (profileImagePath) {
       // Delete old image if it exists
@@ -218,14 +218,22 @@ export class ProfilesService {
           }
         }
       }
-      updateData.profileImageUrl = `/${profileImagePath.replace(/\\/g, '/')}`;
+      user.profileImageUrl = `/${profileImagePath.replace(/\\/g, '/')}`;
     }
 
     if (updateData.dob) {
       updateData.dob = new Date(updateData.dob);
     }
 
+    // Remove null/undefined/empty string fields from updateData
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null || updateData[key] === undefined || updateData[key] === '') {
+        delete updateData[key];
+      }
+    });
+
     Object.assign(user, updateData);
+    user.updatedAt = new Date();
     return this.usersRepository.save(user);
   }
 
