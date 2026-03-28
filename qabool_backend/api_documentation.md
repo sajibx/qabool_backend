@@ -322,4 +322,60 @@ Returns a list of User objects.
 
 ---
 
-## 7. Implementation Notes (Frontend)
+## 7. Reporting (Authenticated)
+
+### Report a User
+`POST /api/v1/reports/:id`
+
+**Headers:**
+```text
+Authorization: Bearer <your_jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "reason": "Inappropriate behavior or explicit content"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "report-uuid",
+  "reporterId": "your-user-uuid",
+  "reportedUserId": "target-user-uuid",
+  "reason": "Inappropriate behavior or explicit content",
+  "createdAt": "2026-03-28T14:00:00.000Z"
+}
+```
+
+**Error Responses:**
+- **409 Conflict (already reported):** `{ "message": "You have already reported this user once", "statusCode": 409 }`
+- **409 Conflict (self-report):** `{ "message": "You cannot report yourself", "statusCode": 409 }`
+- **404 Not Found:** `{ "message": "User to report not found", "statusCode": 404 }`
+
+### List My Reports
+`GET /api/v1/reports`
+
+**Headers:**
+```text
+Authorization: Bearer <your_jwt_token>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "report-uuid",
+    "reporterId": "your-user-uuid",
+    "reportedUserId": "target-user-uuid",
+    "reason": "...",
+    "createdAt": "2026-03-28T14:00:00.000Z"
+  }
+]
+```
+
+---
+
+## 8. Implementation Notes (Frontend)
