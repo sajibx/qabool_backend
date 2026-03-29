@@ -34,7 +34,8 @@ This document provides all the necessary details to integrate the Qabool backend
   "familyMembers": 4,
   "lookingForAge": "25-30",
   "lookingForType": "Religious",
-  "lookingForProfession": "Doctor"
+  "lookingForProfession": "Doctor",
+  "interests": ["Coding", "Reading", "Traveling"]
 }
 ```
 
@@ -53,7 +54,8 @@ This document provides all the necessary details to integrate the Qabool backend
     "verifiedStatus": "inactive",
     "profileImageUrl": "/uploads/random_profile_converted.jpg",
     "lastSeen": "2026-03-14T17:30:00Z",
-    "isOnline": true
+    "isOnline": true,
+    "interests": ["Coding", "Reading", "Traveling"]
   }
 }
 ```
@@ -137,6 +139,7 @@ Returns the full User object of the authenticated user.
   "hasPastIssues": false,
   "acceptsPastIssues": true,
   "phoneNumber": "+1234567890",
+  "interests": ["Coding", "Reading"],
   "profileImage": "(File upload allowed via multipart)"
 }
 ```

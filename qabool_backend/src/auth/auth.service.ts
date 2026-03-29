@@ -64,6 +64,7 @@ export class AuthService {
         lookingForProfession: registerDto.lookingForProfession,
         profileImageUrl: profileImageUrl as string,
         dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
+        interests: registerDto.interests,
       });
 
       console.log('User created successfully:', user.id);

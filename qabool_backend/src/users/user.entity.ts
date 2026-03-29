@@ -181,4 +181,8 @@ export class User {
   @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  interests: string[];
 }

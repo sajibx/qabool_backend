@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, MaxLength, IsEmail, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNumber, IsDateString, MaxLength, IsEmail, IsBoolean, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '../../users/user.entity';
 import { Transform, Type } from 'class-transformer';
@@ -140,4 +140,10 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   phoneNumber?: string;
+
+  @ApiProperty({ example: ['Coding', 'Reading'], required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  interests?: string[];
 }
