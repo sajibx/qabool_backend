@@ -54,9 +54,9 @@ export class NotificationsService {
   async findAll(userId: string) {
     return this.notificationsRepository.find({
       where: { userId },
-      order: { createdAt: 'DESC' },
+      order: { isRead: 'ASC', createdAt: 'DESC' },
       relations: ['sender'],
-      take: 20,
+      take: 50,
     });
   }
 
@@ -74,7 +74,12 @@ export class NotificationsService {
   }
 
   async markAllAsRead(userId: string) {
-    await this.notificationsRepository.update({ userId, isRead: false }, { isRead: true });
+    await this.notificationsRepository
+      .createQueryBuilder()
+      .update(Notification)
+      .set({ isRead: true })
+      .where('userId = :userId', { userId })
+      .execute();
     return { success: true };
   }
 

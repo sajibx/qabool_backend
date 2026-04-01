@@ -1,36 +1,38 @@
-import { Controller, Get, Patch, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Patch, Param, UseGuards } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { User } from '../users/user.entity';
 
 @ApiTags('notifications')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('api/v1/notifications')
+@Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get current user notifications (Last 20)' })
-  async findAll(@Request() req: any) {
-    return this.notificationsService.findAll(req.user.sub);
+  @ApiOperation({ summary: 'Get current user notifications' })
+  async findAll(@GetUser() user: User) {
+    return this.notificationsService.findAll(user.id);
   }
 
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark specific notification as read' })
-  async markAsRead(@Param('id') id: string, @Request() req: any) {
-    return this.notificationsService.markAsRead(id, req.user.sub);
+  async markAsRead(@Param('id') id: string, @GetUser() user: User) {
+    return this.notificationsService.markAsRead(id, user.id);
   }
 
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read' })
-  async markAllAsRead(@Request() req: any) {
-    return this.notificationsService.markAllAsRead(req.user.sub);
+  async markAllAsRead(@GetUser() user: User) {
+    return this.notificationsService.markAllAsRead(user.id);
   }
 
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notifications count' })
-  async getUnreadCount(@Request() req: any) {
-    return this.notificationsService.getUnreadCount(req.user.sub);
+  async getUnreadCount(@GetUser() user: User) {
+    return this.notificationsService.getUnreadCount(user.id);
   }
 }
