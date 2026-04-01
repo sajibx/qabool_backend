@@ -6,6 +6,8 @@ import { MessagingGateway } from '../messaging/messaging.gateway';
 import { User } from '../users/user.entity';
 import { ProfilesService } from '../profiles/profiles.service';
 import { Inject, forwardRef } from '@nestjs/common';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class ConnectionsService {
@@ -17,6 +19,7 @@ export class ConnectionsService {
     private messagingGateway: MessagingGateway,
     @Inject(forwardRef(() => ProfilesService))
     private profilesService: ProfilesService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createRequest(requesterId: string, recipientId: string): Promise<Connection> {
@@ -43,6 +46,14 @@ export class ConnectionsService {
         const requester = await this.usersRepository.findOne({ where: { id: requesterId } });
         if (requester) {
           this.messagingGateway.notifyConnectionRequest(recipientId, requester);
+          
+          // Create persistent notification
+          await this.notificationsService.create(
+            recipientId,
+            requesterId,
+            NotificationType.CONNECTION_REQUEST,
+            `${requester.firstName} sent you a connection request`,
+          );
         }
         
         return saved;
@@ -67,6 +78,14 @@ export class ConnectionsService {
     const requester = await this.usersRepository.findOne({ where: { id: reqIdStr } });
     if (requester) {
       this.messagingGateway.notifyConnectionRequest(recIdStr, requester);
+      
+      // Create persistent notification
+      await this.notificationsService.create(
+        recIdStr,
+        reqIdStr,
+        NotificationType.CONNECTION_REQUEST,
+        `${requester.firstName} sent you a connection request`,
+      );
     }
 
     return saved;
@@ -123,6 +142,21 @@ export class ConnectionsService {
     }
 
     connection.status = status;
-    return this.connectionsRepository.save(connection);
+    const saved = await this.connectionsRepository.save(connection);
+
+    if (status === ConnectionStatus.ACCEPTED) {
+      const accepter = await this.usersRepository.findOne({ where: { id: userId } });
+      if (accepter) {
+        // Notify the person who SENT the request
+        await this.notificationsService.create(
+          connection.requesterId,
+          userId,
+          NotificationType.CONNECTION_ACCEPTED,
+          `${accepter.firstName} accepted your connection request`,
+        );
+      }
+    }
+
+    return saved;
   }
 }

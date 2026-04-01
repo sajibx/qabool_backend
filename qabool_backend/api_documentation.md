@@ -381,4 +381,52 @@ Authorization: Bearer <your_jwt_token>
 
 ---
 
-## 8. Implementation Notes (Frontend)
+## 8. Notifications (Authenticated, Real-time)
+
+### List My Notifications
+`GET /api/v1/notifications`
+- Returns the last 20 notifications for the authenticated user.
+- Notifications are automatically pruned to keep only the latest 20.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "uuid",
+    "type": "FAVORITE",
+    "message": "Jane Doe added you to favorites",
+    "isRead": false,
+    "createdAt": "2026-04-01T10:00:00Z",
+    "sender": {
+      "id": "uuid",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "profileImageUrl": "..."
+    }
+  }
+]
+```
+
+### Mark Notification as Read
+`PATCH /api/v1/notifications/:id/read`
+
+### Mark All as Read
+`PATCH /api/v1/notifications/read-all`
+
+### Get Unread Count
+`GET /api/v1/notifications/unread-count`
+
+**Response (200 OK):**
+```json
+{
+  "count": 5
+}
+```
+
+#### WebSocket Event: `new_notification`
+- **Event**: `new_notification`
+- **Data**: Full notification object (same as in the list).
+
+---
+
+## 9. Implementation Notes (Frontend)

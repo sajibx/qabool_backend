@@ -9,6 +9,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { CommonModule } from './common/common.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -38,6 +39,7 @@ import { join } from 'path';
     ConnectionsModule,
     MessagingModule,
     FavoritesModule,
+    NotificationsModule,
     CommonModule,
   ],
   controllers: [AppController],

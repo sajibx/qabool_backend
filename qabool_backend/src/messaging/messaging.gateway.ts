@@ -130,4 +130,8 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
       },
     });
   }
+
+  notifyNotification(recipientId: string, notification: any) {
+    this.server.to(`user_${recipientId}`).emit('new_notification', notification);
+  }
 }

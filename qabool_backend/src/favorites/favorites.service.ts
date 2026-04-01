@@ -7,6 +7,8 @@ import { ProfilesService } from '../profiles/profiles.service';
 import { Inject, forwardRef } from '@nestjs/common';
 
 import { MessagingGateway } from '../messaging/messaging.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class FavoritesService {
@@ -18,6 +20,7 @@ export class FavoritesService {
     @Inject(forwardRef(() => ProfilesService))
     private profilesService: ProfilesService,
     private messagingGateway: MessagingGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   async addFavorite(userId: string, targetId: string) {
@@ -45,6 +48,14 @@ export class FavoritesService {
     const fromUser = await this.usersRepository.findOne({ where: { id: userIdStr } });
     if (fromUser) {
       this.messagingGateway.notifyNewFavorite(targetIdStr, fromUser);
+      
+      // Create persistent notification
+      await this.notificationsService.create(
+        targetIdStr,
+        userIdStr,
+        NotificationType.FAVORITE,
+        `${fromUser.firstName} ${fromUser.lastName} added you to favorites`,
+      );
     }
 
     return saved;
