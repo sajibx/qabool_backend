@@ -1,0 +1,10 @@
+[17-Feb-2026 23:00:13 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home1/promatra/demo.importwave.net/ExpLedgerTable.php on line 84
+[17-Feb-2026 23:00:32 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home1/promatra/demo.importwave.net/ExpLedgerTable.php on line 84
+[17-Feb-2026 23:00:36 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home1/promatra/demo.importwave.net/ExpLedgerTable.php on line 84
+[17-Feb-2026 23:00:41 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home1/promatra/demo.importwave.net/ExpLedgerTable.php on line 84
+[17-Feb-2026 23:03:56 Asia/Dhaka] PHP Warning:  error_log(/var/log/php_errors.log): Failed to open stream: Permission denied in /home1/promatra/demo.importwave.net/DelShipment.php on line 174
+[17-Feb-2026 23:04:05 Asia/Dhaka] PHP Warning:  error_log(/var/log/php_errors.log): Failed to open stream: Permission denied in /home1/promatra/demo.importwave.net/DelShipment.php on line 174
+[17-Feb-2026 23:04:12 Asia/Dhaka] PHP Warning:  error_log(/var/log/php_errors.log): Failed to open stream: Permission denied in /home1/promatra/demo.importwave.net/DelShipment.php on line 174
+[17-Feb-2026 23:04:33 Asia/Dhaka] PHP Warning:  error_log(/var/log/php_errors.log): Failed to open stream: Permission denied in /home1/promatra/demo.importwave.net/DelShipment.php on line 174
+[17-Feb-2026 23:04:46 Asia/Dhaka] PHP Warning:  error_log(/var/log/php_errors.log): Failed to open stream: Permission denied in /home1/promatra/demo.importwave.net/DelShipment.php on line 174
+[18-Feb-2026 20:45:44 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home1/promatra/demo.importwave.net/ExpLedgerTable.php on line 84

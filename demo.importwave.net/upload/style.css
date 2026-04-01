@@ -1,0 +1,66 @@
+body {
+/*	background-image:url('./images/gplogo.png');*/
+	background-size: 150px;
+	background-attachment:fixed;
+	padding-top: 20px;
+	
+
+}
+
+.container{
+	margin: 0 auto;
+	padding-top: 10px;	
+	width: 75%;
+	height: 580px;
+	background-color: white;
+	opacity: 0.85;
+	border: 0px solid #0099CC;
+	padding-left: 30px;
+	padding-right: 30px;
+
+}
+
+.banner{
+	height: 100px;
+	width: 100%;
+	text-align: center;
+	font-family: 'Telenor';
+	font-size: 40px;
+	color: #0099CC;
+	padding-bottom: 0px;
+}
+
+button {
+  border: none;
+  padding: 0.6em 1.2em;
+  background: #2EB7ED;
+  color: #fff;
+  font-family: 'Lato', Calibri, Arial, sans-serif;
+  font-size: 1em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-block;
+  margin: 3px 2px;
+  border-radius: 2px;
+}
+
+button:hover {
+  background: #2080a5;
+}
+
+.footer {
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    width: 100%;
+    background-color: #0099CC;
+    font: 'Calibri';
+    color: white;
+    text-align: center;
+    padding-top: 10px;
+    font-size: 16px;
+    opacity: 0.80;
+}
