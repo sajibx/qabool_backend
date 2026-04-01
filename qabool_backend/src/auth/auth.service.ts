@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { UserStatus } from '../users/user.entity';
@@ -28,6 +28,18 @@ export class AuthService {
       if (existingUserByPhone) {
         console.log('User already exists (phoneNumber):', registerDto.phoneNumber);
         throw new ConflictException('Phone number already exists');
+      }
+    }
+
+    // Check male registration limit (Limit = femaleCount * 2)
+    const normalizedGender = registerDto.gender?.toLowerCase();
+    if (normalizedGender === 'male') {
+      const maleCount = await this.usersService.countByGender('male');
+      const activeFemaleCount = await this.usersService.countByGender('female', UserStatus.ACTIVE);
+      
+      console.log(`Checking registration limit: maleCount=${maleCount}, activeFemaleCount=${activeFemaleCount}`);
+      if (maleCount >= activeFemaleCount * 2) {
+        throw new BadRequestException('maximum allowed male user is registered, please wait till new slots are available.');
       }
     }
 

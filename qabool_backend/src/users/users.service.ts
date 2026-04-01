@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { Repository, ILike } from 'typeorm';
+import { User, UserStatus } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +13,14 @@ export class UsersService {
   async create(userData: Partial<User>): Promise<User> {
     const user = this.usersRepository.create(userData);
     return this.usersRepository.save(user);
+  }
+
+  async countByGender(gender: string, status?: UserStatus): Promise<number> {
+    const where: any = { gender: ILike(gender) };
+    if (status) {
+      where.status = status;
+    }
+    return this.usersRepository.count({ where });
   }
 
   async findByEmail(email: string): Promise<User | null> {

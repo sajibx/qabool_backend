@@ -19,7 +19,7 @@ async function check() {
   const allUsers = await userRepo.find();
   console.log('--- ALL USERS ---');
     allUsers.forEach(u => {
-      console.log(`User ID: ${u.id}, Name: ${u.firstName} ${u.lastName}, Phone: ${u.phoneNumber}`);
+      console.log(`User ID: ${u.id}, Name: ${u.firstName} ${u.lastName}, Gender: ${u.gender}, Status: ${u.status}`);
     });
 
   await connection.close();

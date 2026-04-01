@@ -121,9 +121,13 @@ export class ProfilesService {
       query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
 
-    // Past Issues Filtering
-    if (currentUser.hasPastIssues === false && currentUser.acceptsPastIssues === false) {
-      query.andWhere('user.hasPastIssues = :hasPastIssues', { hasPastIssues: false });
+    // 1. If I don't accept past issues, don't show me people who have them
+    if (!currentUser.acceptsPastIssues) {
+      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    }
+    // 2. If I HAVE past issues, only show me people who ACCEPT them
+    if (currentUser.hasPastIssues) {
+      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
     }
 
     const users = await query.getMany();
@@ -311,6 +315,14 @@ export class ProfilesService {
       query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
     }
 
+    // Past Issues Filtering
+    if (!currentUser.acceptsPastIssues) {
+      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    }
+    if (currentUser.hasPastIssues) {
+      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
+    }
+
     const users = await query.getMany();
     for (const user of users) {
       await this.populateUserExtraFields(user, currentUser);
@@ -361,6 +373,14 @@ export class ProfilesService {
     const blockedIds = await this.blockingService.getBlockedUserIds(currentUser.id);
     if (blockedIds.length > 0) {
       query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
+    }
+
+    // Past Issues Filtering
+    if (!currentUser.acceptsPastIssues) {
+      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    }
+    if (currentUser.hasPastIssues) {
+      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
     }
 
     const users = await query.getMany();
