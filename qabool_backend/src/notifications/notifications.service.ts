@@ -34,7 +34,7 @@ export class NotificationsService {
       this.messagingGateway.notifyNotification(userId, fullNotification);
     }
 
-    // 4. Enforce the 20-notification limit
+    // 4. Enforce the 20-notification limit (keep only the 20 most recent)
     const count = await this.notificationsRepository.count({ where: { userId } });
     if (count > 20) {
       const oldestNotifications = await this.notificationsRepository.find({
