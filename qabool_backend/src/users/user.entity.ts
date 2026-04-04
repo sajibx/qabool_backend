@@ -138,6 +138,14 @@ export class User {
   @Column({ default: false })
   acceptsPastIssues: boolean;
 
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  pastIssuesDetails: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  acceptedPastIssuesDetails: string;
+
   @ApiProperty()
   @Column({ type: 'varchar', unique: true, nullable: true })
   phoneNumber: string | null;
