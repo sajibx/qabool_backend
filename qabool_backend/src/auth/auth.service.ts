@@ -77,6 +77,13 @@ export class AuthService {
         profileImageUrl: profileImageUrl as string,
         dob: registerDto.dob ? new Date(registerDto.dob) : undefined,
         interests: registerDto.interests,
+        languages: registerDto.languages,
+        personalityTraits: registerDto.personalityTraits,
+        lifeStyle: registerDto.lifeStyle,
+        hobbies: registerDto.hobbies,
+        marriageIntentions: registerDto.marriageIntentions,
+        hasChildren: registerDto.hasChildren,
+        grewUpIn: registerDto.grewUpIn,
       });
 
       console.log('User created successfully:', user.id);

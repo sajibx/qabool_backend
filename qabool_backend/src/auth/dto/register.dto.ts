@@ -129,4 +129,43 @@ export class RegisterDto {
   @IsArray()
   @IsString({ each: true })
   interests?: string[];
+
+  @ApiProperty({ example: ['English', 'Bengali'], required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  languages?: string[];
+
+  @ApiProperty({ example: ['Kind', 'Humorous'], required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  personalityTraits?: string[];
+
+  @ApiProperty({ example: ['Non-smoker', 'Praying five times'], required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  lifeStyle?: string[];
+
+  @ApiProperty({ example: ['Cooking', 'Photography'], required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  hobbies?: string[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  marriageIntentions?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  hasChildren?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  grewUpIn?: string;
 }

@@ -185,4 +185,32 @@ export class User {
   @ApiProperty({ type: [String], nullable: true })
   @Column({ type: 'text', array: true, nullable: true })
   interests: string[];
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  languages: string[];
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  personalityTraits: string[];
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  lifeStyle: string[];
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  hobbies: string[];
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'text', nullable: true })
+  marriageIntentions: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  hasChildren: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  grewUpIn: string;
 }
