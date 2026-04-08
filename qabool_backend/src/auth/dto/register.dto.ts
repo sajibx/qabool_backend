@@ -178,4 +178,14 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   grewUpIn?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  sect?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  caste?: string;
 }

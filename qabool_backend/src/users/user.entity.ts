@@ -221,4 +221,12 @@ export class User {
   @ApiProperty({ nullable: true })
   @Column({ nullable: true })
   grewUpIn: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  sect: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  caste: string;
 }
