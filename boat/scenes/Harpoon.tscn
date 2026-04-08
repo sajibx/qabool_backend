@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://ddharpoon"]
+
+[ext_resource type="Script" path="res://scripts/Harpoon.gd" id="1_script"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_harpoon"]
+top_radius = 0.05
+bottom_radius = 0.05
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iron"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+metallic = 1.0
+roughness = 0.5
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_harpoon"]
+radius = 0.05
+height = 1.0
+
+[node name="Harpoon" type="RigidBody3D"]
+mass = 2.0
+gravity_scale = 1.0
+script = ExtResource("1_script")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+mesh = SubResource("CylinderMesh_harpoon")
+surface_material_override/0 = SubResource("StandardMaterial3D_iron")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
+shape = SubResource("CylinderShape3D_harpoon")

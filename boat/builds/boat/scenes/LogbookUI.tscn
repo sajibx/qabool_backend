@@ -1,0 +1,210 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddlogbook"]
+
+[gd_script type="GDScript" id="GDScript_logbook"]
+script/source = "extends Control
+
+@onready var discovery_label = $Panel/DiscoveryLabel
+@onready var stamp_container = $Panel/ScrollContainer/StampGrid
+@onready var vista_container = $Panel/VistaContainer/VistaGrid
+@onready var shop_container = $Panel/ShopContainer
+
+func _ready():
+	_update_ui()
+	GameManager.discovery_updated.connect(_on_discovery_updated)
+	GameManager.landmark_discovered.connect(_on_discovery_updated)
+	GameManager.vista_sketched.connect(_on_discovery_updated)
+	
+	# Connect Shop Buttons
+	$Panel/ShopContainer/LanternBtn.pressed.connect(func(): _on_buy(\"lantern\", 5))
+	$Panel/ShopContainer/ParrotBtn.pressed.connect(func(): _on_buy(\"parrot\", 10))
+	$Panel/ShopContainer/SailsBtn.pressed.connect(func(): _on_buy(\"crimson_sails\", 15))
+	$Panel/HomeBtn.pressed.connect(_on_home_pressed)
+	$Panel/CloseBtn.pressed.connect(queue_free)
+
+func _on_home_pressed():
+	var env = get_tree().current_scene.get_node_or_null(\"EnvironmentManager\")
+	if env and env.current_weather == env.Weather.STORM:
+		print(\"Cannot fast travel in a storm!\")
+		return
+	
+	GameManager.fast_travel_home()
+	queue_free()
+
+func _update_ui():
+	discovery_label.text = \"Discovery Points: \" + str(GameManager.discovery_points)
+	
+	# Update Stamps
+	for child in stamp_container.get_children():
+		child.queue_free()
+	
+	for landmark in GameManager.discovered_landmarks:
+		var lbl = Label.new()
+		lbl.text = \"[ LANDMARK ]\\n\" + landmark.split(\"_\")[0]
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		stamp_container.add_child(lbl)
+		
+	# Update Sketches
+	for child in vista_container.get_children():
+		child.queue_free()
+		
+	for vista in GameManager.sketched_vistas:
+		var lbl = Label.new()
+		lbl.text = \"[ SKETCH ]\\n\" + vista.split(\"_\")[0]
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.theme_override_colors/font_color = Color(1, 0.9, 0.4, 1) # Gold for sketches
+		vista_container.add_child(lbl)
+		
+	# Update Buttons
+	if \"lantern\" in GameManager.unlocked_cosmetics: $Panel/ShopContainer/LanternBtn.disabled = true
+	if \"parrot\" in GameManager.unlocked_cosmetics: $Panel/ShopContainer/ParrotBtn.disabled = true
+	if \"crimson_sails\" in GameManager.unlocked_cosmetics: $Panel/ShopContainer/SailsBtn.disabled = true
+
+func _on_buy(name: String, cost: int):
+	if GameManager.unlock_cosmetic(name, cost):
+		_update_ui()
+
+func _on_discovery_updated(_pts):
+	_update_ui()
+"
+
+[node name="LogbookUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_logbook")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.705882)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -400.0
+offset_right = 600.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 48
+text = "CAPTAIN'S LOG"
+horizontal_alignment = 1
+
+[node name="DiscoveryLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 100.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Discovery Points: 0"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 180.0
+offset_right = 650.0
+offset_bottom = 450.0
+
+[node name="StampGrid" type="GridContainer" parent="Panel/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="VistaContainer" type="ScrollContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 480.0
+offset_right = 650.0
+offset_bottom = 750.0
+
+[node name="VistaGrid" type="GridContainer" parent="Panel/VistaContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
+
+[node name="ShopContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 180.0
+offset_right = 1100.0
+offset_bottom = 750.0
+theme_override_constants/separation = 20
+
+[node name="ShopTitle" type="Label" parent="Panel/ShopContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "COSMETICS"
+horizontal_alignment = 1
+
+[node name="LanternBtn" type="Button" parent="Panel/ShopContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Bow Lantern (5 Pts)"
+
+[node name="ParrotBtn" type="Button" parent="Panel/ShopContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Pet Parrot (10 Pts)"
+
+[node name="SailsBtn" type="Button" parent="Panel/ShopContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Crimson Sails (15 Pts)"
+
+[node name="HomeBtn" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_top = 20.0
+offset_right = -120.0
+offset_bottom = 100.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0, 0.8, 0.4, 1) # Green
+theme_override_font_sizes/font_size = 24
+text = "RETURN HOME"
+
+[node name="CloseBtn" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 100.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 40
+text = "X"

@@ -1,0 +1,59 @@
+[gd_scene load_steps=6 format=3 uid="uid://ddlandmark"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_detect"]
+size = Vector3(4, 4, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_statue"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+roughness = 0.8
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_phys"]
+size = Vector3(1, 2, 1)
+
+[gd_script type="GDScript" id="GDScript_landmark"]
+script/source = "extends Interactable
+
+@export var landmark_name: String = \"Ancient Statue\"
+@export var discovery_value: int = 5
+var is_discovered = false
+
+func _ready():
+	add_to_group(\"landmarks\")
+	$Label3D.text = \"???\"
+
+func interact():
+	if not is_discovered:
+		$Label3D.text = landmark_name
+		is_discovered = true
+		GameManager.add_discovery_points(discovery_value, landmark_name + \"_\" + str(global_position))
+		# Feedback
+		print(\"Discovered Landmark: \", landmark_name)
+"
+
+[node name="Landmark" type="StaticBody3D"]
+script = SubResource("GDScript_landmark")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_statue")
+surface_material_override/0 = SubResource("StandardMaterial3D_stone")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("BoxShape3D_phys")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_detect")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+billboard = 1
+text = "Ancient Statue"
+font_size = 48
+outline_size = 12

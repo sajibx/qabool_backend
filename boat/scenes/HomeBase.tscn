@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://ddhomebase"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_island"]
+top_radius = 50.0
+bottom_radius = 60.0
+height = 5.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.2, 0.5, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cabin"]
+size = Vector3(10, 8, 12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.4, 0.25, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dock"]
+size = Vector3(20, 2, 40)
+
+[node name="HomeBase" type="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+
+[node name="Island" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_island")
+surface_material_override/0 = SubResource("StandardMaterial3D_grass")
+
+[node name="Cabin" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, -20)
+mesh = SubResource("BoxMesh_cabin")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="Dock" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 35)
+mesh = SubResource("BoxMesh_dock")
+surface_material_override/0 = SubResource("StandardMaterial3D_wood")
+
+[node name="DockPoint" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 50)

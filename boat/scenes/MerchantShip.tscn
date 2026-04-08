@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=3 uid="uid://ddmerchant"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_hull"]
+size = Vector3(4, 3, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_merchant"]
+albedo_color = Color(0.1, 0.1, 0.3, 1) # Dark Blue Hull
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_trade"]
+radius = 15.0
+
+[gd_script type="GDScript" id="GDScript_merchant"]
+script/source = "extends StaticBody3D
+
+func _ready():
+	add_to_group(\"merchants\")
+	$TradeArea.body_entered.connect(_on_body_entered)
+
+func _on_body_entered(body):
+	if body.is_in_group(\"player_ship\"):
+		var ui = load(\"res://scenes/TradeUI.tscn\").instantiate()
+		get_tree().current_scene.add_child(ui)
+"
+
+[node name="MerchantShip" type="StaticBody3D"]
+script = SubResource("GDScript_merchant")
+
+[node name="Hull" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_hull")
+surface_material_override/0 = SubResource("StandardMaterial3D_merchant")
+
+[node name="Lantern" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 3)
+light_color = Color(1, 0.8, 0.2, 1) # Golden Glow
+light_energy = 5.0
+omni_range = 10.0
+
+[node name="TradeArea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TradeArea"]
+shape = SubResource("SphereShape3D_trade")

@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://ddancientrelic"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_pedestal"]
+size = Vector3(1, 0.8, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.3, 0.3, 0.3, 1)
+roughness = 0.9
+
+[sub_resource type="PrismMesh" id="PrismMesh_relic"]
+size = Vector3(0.4, 0.4, 0.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glow"]
+resource_local_to_scene = true
+shading_mode = 0
+albedo_color = Color(1, 0, 0, 1) # Initial Red
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hit"]
+size = Vector3(1.2, 1.5, 1.2)
+
+[gd_script type="GDScript" id="GDScript_relic"]
+script/source = "extends Interactable
+
+var is_activated = false
+
+func interact():
+	if is_activated: return
+	is_activated = true
+	
+	var relic_mesh = $HoveringRelic
+	var mat = relic_mesh.get_surface_override_material(0)
+	
+	var tween = create_tween()
+	# Rotate 90 degrees
+	tween.tween_property(relic_mesh, \"rotation_degrees:y\", relic_mesh.rotation_degrees.y + 90, 1.5).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	# Color shift Red -> Cyan
+	tween.parallel().tween_property(mat, \"albedo_color\", Color(0, 1, 1, 1), 1.5)
+	
+	tween.finished.connect(_on_tween_finished)
+
+func _on_tween_finished():
+	GameManager.add_ship_blueprint()
+	print(\"Relic activated! Blueprint awarded.\")
+	# Interaction is already effectively disabled by is_activated check
+"

@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://ddancientcoin"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_coin"]
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.05
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
+shading_mode = 0
+albedo_color = Color(1, 0.9, 0.2, 1) # Gold Glow Effect
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_coin"]
+radius = 0.2
+height = 0.1
+
+[gd_script type="GDScript" id="GDScript_collect_coin"]
+script/source = "extends Interactable
+
+@export var item_type: String = \"coin\"
+
+func interact():
+	GameManager.collect_item(item_type)
+	_play_pop_and_free()
+
+func _play_pop_and_free():
+	var audio = AudioStreamPlayer3D.new()
+	audio.stream = load(\"res://audio/water_splash.ogg\") # Placeholder pop
+	audio.pitch_scale = 3.0
+	get_tree().current_scene.add_child(audio)
+	audio.global_position = global_position
+	audio.play()
+	audio.finished.connect(audio.queue_free)
+	queue_free()
+"
+
+[node name="AncientCoin" type="StaticBody3D"]
+script = SubResource("GDScript_collect_coin")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.05, 0)
+mesh = SubResource("CylinderMesh_coin")
+surface_material_override/0 = SubResource("StandardMaterial3D_gold")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+shape = SubResource("CylinderShape3D_coin")

@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://ddvistapoint"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_detect"]
+radius = 4.0
+
+[gd_script type="GDScript" id="GDScript_vista"]
+script/source = "extends Area3D
+
+@export var vista_id: String = \"\"
+var is_active = true
+
+func _ready():
+	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
+	# Find vista_id if not set (use position)
+	if vista_id == \"\":
+		vista_id = \"Vista_\" + str(global_position).hash()
+
+func _on_body_entered(body):
+	if is_active and body.is_in_group(\"player\"):
+		var hud = get_tree().current_scene.get_node_or_null(\"MobileHUD\")
+		if hud:
+			hud.show_sketch_prompt(vista_id, self)
+
+func _on_body_exited(body):
+	if body.is_in_group(\"player\"):
+		var hud = get_tree().current_scene.get_node_or_null(\"MobileHUD\")
+		if hud:
+			hud.hide_sketch_prompt()
+
+func complete_vista():
+	is_active = false
+	# Visual/Audio feedback if needed
+	queue_free()
+"
+
+[node name="VistaPoint" type="Area3D"]
+script = SubResource("GDScript_vista")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_detect")

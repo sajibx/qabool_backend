@@ -1,0 +1,179 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddtrade"]
+
+[gd_script type="GDScript" id="GDScript_trade"]
+script/source = "extends Control
+
+func _ready():
+	$Panel/CloseBtn.pressed.connect(queue_free)
+	$Panel/Item1/Btn.pressed.connect(func(): _on_trade(\"mushroom\", 10, \"gold_hull\"))
+	$Panel/Item2/Btn.pressed.connect(func(): _on_trade(\"shell\", 10, \"ghost_sail\"))
+	$Panel/Item3/Btn.pressed.connect(func(): _on_trade(\"coin\", 5, \"legendary_compass\"))
+	_update_ui()
+
+func _update_ui():
+	$Panel/MushroomCount.text = \"Mushrooms: \" + str(GameManager.mushroom_count)
+	$Panel/ShellCount.text = \"Shells: \" + str(GameManager.shell_count)
+	$Panel/CoinCount.text = \"Coins: \" + str(GameManager.coin_count)
+
+func _on_trade(item: String, amount: int, reward: String):
+	var current = 0
+	match item:
+		\"mushroom\": current = GameManager.mushroom_count
+		\"shell\": current = GameManager.shell_count
+		\"coin\": current = GameManager.coin_count
+	
+	if current >= amount:
+		GameManager.collect_item(item, -amount)
+		GameManager.unlocked_cosmetics.append(reward)
+		print(\"Traded for: \", reward)
+		_update_ui()
+	else:
+		print(\"Not enough \", item, \"!\")
+"
+
+[node name="TradeUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_trade")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 0.8)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -104.0
+offset_top = 20.0
+offset_right = 104.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
+text = "MERCHANT"
+
+[node name="MushroomCount" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 80.0
+offset_right = 400.0
+offset_bottom = 110.0
+text = "Mushrooms: 0"
+
+[node name="ShellCount" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 110.0
+offset_right = 400.0
+offset_bottom = 140.0
+text = "Shells: 0"
+
+[node name="CoinCount" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 140.0
+offset_right = 400.0
+offset_bottom = 170.0
+text = "Coins: 0"
+
+[node name="Item1" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = -20.0
+offset_right = -40.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/Item1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Gilded Hull (10 Mush)"
+
+[node name="Btn" type="Button" parent="Panel/Item1"]
+layout_mode = 2
+text = " TRADE "
+
+[node name="Item2" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/Item2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ghost Sail (10 Shell)"
+
+[node name="Btn" type="Button" parent="Panel/Item2"]
+layout_mode = 2
+text = " TRADE "
+
+[node name="Item3" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 40.0
+offset_top = 100.0
+offset_right = -40.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/Item3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Legendary Compass (5 Coin)"
+
+[node name="Btn" type="Button" parent="Panel/Item3"]
+layout_mode = 2
+text = " TRADE "
+
+[node name="CloseBtn" type="Button" parent="Panel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 60.0
+grow_horizontal = 0
+text = "X"

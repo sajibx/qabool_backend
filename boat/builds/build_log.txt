@@ -1,0 +1,32 @@
+Godot Engine v4.2.stable.official.46dc27791 - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Using "default" pen tablet driver...
+ 
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CameraServer: Registered camera FaceTime HD Camera with ID 1 and position 0 at index 0
+CORE API HASH: 2491192330
+EDITOR API HASH: 4136044270
+[1;33mWARNING:[0;93m Custom cursor shape not supported by this display server.
+[0;90m     at: cursor_set_custom_image (servers/display_server.cpp:505)[0m
+EditorSettings: Load OK!
+[1;33mWARNING:[0;93m Blend file import is enabled in the project settings, but no Blender path is configured in the editor settings. Blend files will not be imported.
+[0;90m     at: _editor_init (modules/gltf/register_types.cpp:63)[0m
+Loaded system CA certificates
+Failed to bind socket. Error: 3
+Failed to bind socket. Error: 3
+EditorSettings: Save OK!
+[1;31mERROR:[0;91m Cannot export project with preset "macOS" due to configuration errors:
+Invalid bundle identifier: Identifier is missing.
+Warning: Notarization is disabled. The exported project will be blocked by Gatekeeper if it's downloaded from an unknown source.
+Code signing: Using ad-hoc signature. The exported project will be blocked by Gatekeeper
+
+[0;90m   at: _fs_changed (editor/editor_node.cpp:978)[0m
+[1;31mERROR:[0;91m Project export for preset "macOS" failed.
+[0;90m   at: _fs_changed (editor/editor_node.cpp:994)[0m
+EditorSettings: Save OK!
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+Orphan StringName: Node (static: 6, total: 7)
+StringName: 1 unclaimed string names at exit.

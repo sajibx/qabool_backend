@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://ddwhale_boss"]
+
+[ext_resource type="Script" path="res://scripts/WhaleBoss.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://ddwhale_hud" path="res://scenes/WhaleHUD.tscn" id="2_hud"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_whale"]
+size = Vector3(10, 8, 30)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_whale"]
+albedo_color = Color(0.1, 0.2, 0.3, 1)
+roughness = 0.5
+
+[sub_resource type="Environment" id="Environment_deep"]
+background_mode = 1
+background_color = Color(0.01, 0.05, 0.1, 1)
+fog_enabled = true
+fog_light_color = Color(0.01, 0.1, 0.2, 1)
+fog_density = 0.05
+
+[sub_resource type="BoxMesh" id="BoxMesh_rope"]
+size = Vector3(0.1, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rope"]
+albedo_color = Color(0.5, 0.3, 0.1, 1)
+
+[node name="WhaleBoss" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Path3D" type="Path3D" parent="."]
+
+[node name="PathFollowWhale" type="PathFollow3D" parent="Path3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="Whale" type="MeshInstance3D" parent="Path3D/PathFollowWhale"]
+mesh = SubResource("BoxMesh_whale")
+surface_material_override/0 = SubResource("StandardMaterial3D_whale")
+
+[node name="PathFollowShip" type="PathFollow3D" parent="Path3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -35)
+
+[node name="ShipPlaceholder" type="MeshInstance3D" parent="Path3D/PathFollowShip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_whale") # Replace with player ship mesh if needed
+
+[node name="RopeMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_rope")
+surface_material_override/0 = SubResource("StandardMaterial3D_rope")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
+light_color = Color(0.4, 0.6, 1, 1)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 10, 40)
+current = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_deep")
+
+[node name="WhaleHUD" parent="." instance=ExtResource("2_hud")]

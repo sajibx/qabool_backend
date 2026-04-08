@@ -1,0 +1,96 @@
+[gd_scene load_steps=50 format=3 uid="uid://cg2syp7gylkww"]
+[ext_resource type="Shader" path="res://shaders/water.gdshader" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/Ship.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/IslandGenerator.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/EnvironmentManager.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/MobileHUD.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/EnemyShip.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/UpgradeMenu.tscn" id="7"]
+[ext_resource type="Script" path="res://scripts/AudioManager.gd" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/HomeBase.tscn" id="9"]
+[ext_resource type="Script" path="res://scripts/MerchantManager.gd" id="10"]
+[sub_resource type="ShaderMaterial" id="1"]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/water_color = Color(0, 0.6, 1, 1)
+shader_parameter/wave_speed = 1.5
+shader_parameter/wave_height = 2.0
+shader_parameter/wave_frequency = 1.0
+[sub_resource type="PlaneMesh" id="2"]
+material = SubResource("1")
+size = Vector2(4000, 4000)
+subdivide_width = 400
+subdivide_depth = 400
+[sub_resource type="ProceduralSkyMaterial" id="3"]
+sky_top_color = Color(0.29, 0.56, 0.89, 1)
+sky_horizon_color = Color(0.82, 0.91, 1, 1)
+ground_bottom_color = Color(0.2, 0.2, 0.2, 1)
+ground_horizon_color = Color(0.82, 0.91, 1, 1)
+[sub_resource type="Sky" id="4"]
+sky_material = SubResource("3")
+[sub_resource type="Environment" id="5"]
+background_mode = 2
+sky = SubResource("4")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_sky_contribution = 0.5
+tonemap_mode = 2
+glow_enabled = true
+[sub_resource type="ParticleProcessMaterial" id="6"]
+emission_shape = 3
+emission_box_extents = Vector3(40, 0, 40)
+direction = Vector3(0, -1, 0)
+spread = 0.0
+gravity = Vector3(0, -20, 0)
+initial_velocity_min = 20.0
+initial_velocity_max = 30.0
+color = Color(0.8, 0.9, 1, 0.6)
+[sub_resource type="StandardMaterial3D" id="7"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.7, 0.8, 1, 0.5)
+[sub_resource type="BoxMesh" id="8"]
+material = SubResource("7")
+size = Vector3(0.05, 1, 0.05)
+[node name="Main" type="Node3D"]
+[node name="HomeBase" parent="." instance=ExtResource("9")]
+[node name="MerchantManager" type="Node" parent="."]
+script = ExtResource("10")
+[node name="Ocean" type="MeshInstance3D" parent="."]
+mesh = SubResource("2")
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 20, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+[node name="Ship" parent="." instance=ExtResource("2")]
+[node name="IslandGenerator" type="Node3D" parent="."]
+script = ExtResource("3")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("5")
+[node name="EnvironmentManager" type="Node" parent="."]
+script = ExtResource("4")
+sun_path = NodePath("../DirectionalLight3D")
+env_path = NodePath("../WorldEnvironment")
+rain_particles_path = NodePath("../RainParticles")
+ocean_path = NodePath("../Ocean")
+thunder_path = NodePath("../ThunderPlayer")
+[node name="ThunderPlayer" type="AudioStreamPlayer" parent="."]
+[node name="RainParticles" type="GPUParticles3D" parent="."]
+emitting = false
+amount = 4000
+lifetime = 1.0
+visibility_aabb = AABB(-100, -100, -100, 200, 200, 200)
+process_material = SubResource("6")
+draw_pass_1 = SubResource("8")
+[node name="MobileHUD" parent="." instance=ExtResource("5")]
+[node name="UpgradeMenu" parent="." instance=ExtResource("7")]
+[node name="EnemyShip" parent="." instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 150)
+[node name="DayMusic" type="AudioStreamPlayer" parent="."]
+[node name="NightMusic" type="AudioStreamPlayer" parent="."]
+[node name="ShantyMusic" type="AudioStreamPlayer" parent="."]
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("8")
+day_music_path = NodePath("../DayMusic")
+night_music_path = NodePath("../NightMusic")
+shanty_music_path = NodePath("../ShantyMusic")

@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://ddspout"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_detect"]
+radius = 50.0
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_spout"]
+direction = Vector3(0, 1, 0)
+spread = 5.0
+initial_velocity_min = 15.0
+initial_velocity_max = 20.0
+gravity = Vector3(0, -9.8, 0)
+scale_min = 0.2
+scale_max = 0.5
+color = Color(1, 1, 1, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spout"]
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_spout"]
+material = SubResource("StandardMaterial3D_spout")
+size = Vector3(0.4, 0.4, 0.4)
+
+[node name="WhaleSpawnPoint" type="Area3D" groups=["encounter_triggers"]]
+collision_layer = 1
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_detect")
+
+[node name="SpoutParticles" type="GPUParticles3D" parent="."]
+amount = 100
+lifetime = 1.5
+process_material = SubResource("ParticleProcessMaterial_spout")
+draw_pass_1 = SubResource("BoxMesh_spout")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+light_color = Color(0.4, 0.6, 1, 1)
+light_energy = 5.0
+omni_range = 15.0
