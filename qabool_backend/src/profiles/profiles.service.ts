@@ -121,13 +121,12 @@ export class ProfilesService {
       query.andWhere('user.region LIKE :region', { region: `%${filters.region}%` });
     }
 
-    // 1. If I don't accept past issues, don't show me people who have them
-    if (!currentUser.acceptsPastIssues) {
-      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    // Challenge-based Filtering
+    if (!currentUser.readyToQaboolChallenges) {
+      query.andWhere('user.facingChallenges = :noChallenges', { noChallenges: false });
     }
-    // 2. If I HAVE past issues, only show me people who ACCEPT them
-    if (currentUser.hasPastIssues) {
-      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
+    if (currentUser.facingChallenges) {
+      query.andWhere('user.readyToQaboolChallenges = :acceptsChallenges', { acceptsChallenges: true });
     }
 
     const users = await query.getMany();
@@ -279,18 +278,12 @@ export class ProfilesService {
       .where('user.status = :status', { status: UserStatus.ACTIVE })
       .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
 
-    // 2. Initial attempt with strict gender filter
+    // 2. Strict gender filter
     let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
-    console.log(`ProfilesService (getHome): Target gender for ${currentUser.email} (${currentUser.gender}) is ${targetGender}`);
-    
-    const genderFilteredQuery = query.clone().andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
-    let users = await genderFilteredQuery.getMany();
+    console.log(`ProfilesService (getHome): Enforcing target gender for ${currentUser.email} (${currentUser.gender}) as ${targetGender}`);
+    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
 
-    if (users.length === 0) {
-      console.log(`ProfilesService (getHome): No results for target gender ${targetGender}. Trying with all genders.`);
-      users = await query.getMany();
-    }
-    console.log(`ProfilesService (getHome): Found ${users.length} users after fallback check.`);
+    // 3. Filter out connected users
     const connectedQuery = this.connectionsRepository.createQueryBuilder('conn')
       .select('CASE WHEN conn.requesterId = :myId THEN conn.recipientId ELSE conn.requesterId END', 'userId')
       .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
@@ -322,15 +315,17 @@ export class ProfilesService {
       query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
     }
 
-    // Past Issues Filtering
-    if (!currentUser.acceptsPastIssues) {
-      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    // Challenge-based Filtering
+    if (!currentUser.readyToQaboolChallenges) {
+      // If I don't accept challenges, don't show me people who have them
+      query.andWhere('user.facingChallenges = :noChallenges', { noChallenges: false });
     }
-    if (currentUser.hasPastIssues) {
-      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
+    if (currentUser.facingChallenges) {
+      // If I have challenges, only show me people who are ready to accept them
+      query.andWhere('user.readyToQaboolChallenges = :acceptsChallenges', { acceptsChallenges: true });
     }
 
-    users = await query.getMany();
+    const users = await query.getMany();
     for (const user of users) {
       await this.populateUserExtraFields(user, currentUser);
     }
@@ -344,9 +339,8 @@ export class ProfilesService {
 
     // Gender filter
     let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
-    console.log(`ProfilesService (getExplore): Target gender for ${currentUser.email} (${currentUser.gender}) is ${targetGender}`);
-    
-    const genderFilteredQuery = query.clone().andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+    console.log(`ProfilesService (getExplore): Enforcing target gender for ${currentUser.email} (${currentUser.gender}) as ${targetGender}`);
+    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
 
     // Filter connected
     if (!includeConnected) {
@@ -384,12 +378,12 @@ export class ProfilesService {
       query.andWhere('user.id NOT IN (:...blockedIds)', { blockedIds });
     }
 
-    // Past Issues Filtering
-    if (!currentUser.acceptsPastIssues) {
-      query.andWhere('user.hasPastIssues = :noIssues', { noIssues: false });
+    // Challenge-based Filtering
+    if (!currentUser.readyToQaboolChallenges) {
+      query.andWhere('user.facingChallenges = :noChallenges', { noChallenges: false });
     }
-    if (currentUser.hasPastIssues) {
-      query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
+    if (currentUser.facingChallenges) {
+      query.andWhere('user.readyToQaboolChallenges = :acceptsChallenges', { acceptsChallenges: true });
     }
 
     const users = await query.getMany();
