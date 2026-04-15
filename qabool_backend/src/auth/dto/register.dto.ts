@@ -31,16 +31,6 @@ export class RegisterDto {
   @IsString()
   dob?: string;
 
-  @ApiProperty({ example: 'South Asian', required: false })
-  @IsOptional()
-  @IsString()
-  ethnicity?: string;
-
-  @ApiProperty({ example: 'Islam', required: false })
-  @IsOptional()
-  @IsString()
-  religion?: string;
-
   @ApiProperty({ example: 175, required: false })
   @IsOptional()
   height?: number;
@@ -48,16 +38,6 @@ export class RegisterDto {
   @ApiProperty({ example: 70, required: false })
   @IsOptional()
   weight?: number;
-
-  @ApiProperty({ example: 'Software Engineer', required: false })
-  @IsOptional()
-  @IsString()
-  profession?: string;
-
-  @ApiProperty({ example: 'Bachelor of Science', required: false })
-  @IsOptional()
-  @IsString()
-  education?: string;
 
   @ApiProperty({ example: 'I love coding...', required: false })
   @IsOptional()
@@ -129,22 +109,11 @@ export class RegisterDto {
   @IsString()
   lookingForType?: string;
 
-  @ApiProperty({ example: 'Doctor', required: false })
-  @IsOptional()
-  @IsString()
-  lookingForProfession?: string;
-
   @ApiProperty({ example: ['Coding', 'Reading'], required: false, type: [String] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   interests?: string[];
-
-  @ApiProperty({ example: ['English', 'Bengali'], required: false, type: [String] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  languages?: string[];
 
   @ApiProperty({ example: ['Kind', 'Humorous'], required: false, type: [String] })
   @IsOptional()
@@ -167,11 +136,6 @@ export class RegisterDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  marriageIntentions?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
   hasChildren?: string;
 
   @ApiProperty({ required: false })
@@ -182,10 +146,49 @@ export class RegisterDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  sect?: string;
+  education?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  caste?: string;
+  religion?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  religionSect?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  religionCast?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  language?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  managedBySomeoneElse?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  facingChallenges?: boolean;
+
+  @ApiProperty({ required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  facingChallengesList?: string[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  readyToQaboolChallenges?: boolean;
+
+  @ApiProperty({ required: false, type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  readyToQaboolChallengesList?: string[];
 }

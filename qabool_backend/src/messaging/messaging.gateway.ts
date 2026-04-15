@@ -82,6 +82,33 @@ export class MessagingGateway implements OnGatewayConnection, OnGatewayDisconnec
     return message;
   }
 
+  @SubscribeMessage('send_image_p2p')
+  async handleImageP2P(
+    @MessageBody() data: { chatId: string; recipientId: string; content: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const senderId = client.data.user.sub.toString();
+    const recipientId = data.recipientId?.toString();
+    
+    if (!recipientId) return;
+    
+    await this.usersService.updateLastSeen(senderId);
+    
+    // Relay image without saving
+    const ephemeralMessage = {
+      id: `temp-${Date.now()}`,
+      chatId: data.chatId,
+      senderId: senderId,
+      content: data.content,
+      type: MessageType.IMAGE_P2P,
+      status: 'SENT',
+      createdAt: new Date().toISOString(),
+    };
+    
+    this.server.to(`user_${senderId}`).emit('new_message', ephemeralMessage);
+    this.server.to(`user_${recipientId}`).emit('new_message', ephemeralMessage);
+  }
+
   @SubscribeMessage('typing_status')
   async handleTyping(
     @MessageBody() data: { chatId: string; recipientId: string; isTyping: boolean },

@@ -63,14 +63,6 @@ export class User {
   region: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  religion: string;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  ethnicity: string;
-
-  @ApiProperty()
   @Column({ type: 'float', nullable: true })
   height: number;
 
@@ -107,20 +99,8 @@ export class User {
   lookingForType: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  lookingForProfession: string;
-
-  @ApiProperty()
   @Column({ enum: VerifiedStatus, default: VerifiedStatus.INACTIVE })
   verifiedStatus: VerifiedStatus;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  profession: string;
-
-  @ApiProperty()
-  @Column({ nullable: true })
-  education: string;
 
   @ApiProperty()
   @Column({ type: 'text', nullable: true })
@@ -196,10 +176,6 @@ export class User {
 
   @ApiProperty({ type: [String], nullable: true })
   @Column({ type: 'text', array: true, nullable: true })
-  languages: string[];
-
-  @ApiProperty({ type: [String], nullable: true })
-  @Column({ type: 'text', array: true, nullable: true })
   personalityTraits: string[];
 
   @ApiProperty({ type: [String], nullable: true })
@@ -211,22 +187,50 @@ export class User {
   hobbies: string[];
 
   @ApiProperty({ nullable: true })
-  @Column({ type: 'text', nullable: true })
-  marriageIntentions: string;
-
-  @ApiProperty({ nullable: true })
-  @Column({ nullable: true })
-  hasChildren: string;
-
-  @ApiProperty({ nullable: true })
   @Column({ nullable: true })
   grewUpIn: string;
 
   @ApiProperty({ nullable: true })
-  @Column({ nullable: true })
-  sect: string;
+  @Column({ type: 'text', nullable: true })
+  otherRequirements: string;
+
+  @ApiProperty()
+  @Column({ default: false })
+  managedBySomeoneElse: boolean;
+
+  @ApiProperty()
+  @Column({ default: false })
+  facingChallenges: boolean;
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  facingChallengesList: string[];
+
+  @ApiProperty()
+  @Column({ default: false })
+  readyToQaboolChallenges: boolean;
+
+  @ApiProperty({ type: [String], nullable: true })
+  @Column({ type: 'text', array: true, nullable: true })
+  readyToQaboolChallengesList: string[];
 
   @ApiProperty({ nullable: true })
   @Column({ nullable: true })
-  caste: string;
+  education: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  religion: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  religionSect: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  religionCast: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  language: string;
 }

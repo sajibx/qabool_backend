@@ -6,6 +6,7 @@ import { User } from '../../users/user.entity';
 export enum MessageType {
   TEXT = 'TEXT',
   IMAGE = 'IMAGE',
+  IMAGE_P2P = 'IMAGE_P2P',
 }
 
 export enum MessageStatus {

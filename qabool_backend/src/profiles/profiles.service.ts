@@ -279,11 +279,18 @@ export class ProfilesService {
       .where('user.status = :status', { status: UserStatus.ACTIVE })
       .andWhere('user.id != :currentUserId', { currentUserId: currentUser.id });
 
-    // 2. Gender filter
+    // 2. Initial attempt with strict gender filter
     let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
-    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+    console.log(`ProfilesService (getHome): Target gender for ${currentUser.email} (${currentUser.gender}) is ${targetGender}`);
+    
+    const genderFilteredQuery = query.clone().andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+    let users = await genderFilteredQuery.getMany();
 
-    // 3. Filter out connected users (only ACCEPTED status)
+    if (users.length === 0) {
+      console.log(`ProfilesService (getHome): No results for target gender ${targetGender}. Trying with all genders.`);
+      users = await query.getMany();
+    }
+    console.log(`ProfilesService (getHome): Found ${users.length} users after fallback check.`);
     const connectedQuery = this.connectionsRepository.createQueryBuilder('conn')
       .select('CASE WHEN conn.requesterId = :myId THEN conn.recipientId ELSE conn.requesterId END', 'userId')
       .where('(conn.requesterId = :myId OR conn.recipientId = :myId)')
@@ -323,7 +330,7 @@ export class ProfilesService {
       query.andWhere('user.acceptsPastIssues = :acceptsOthersIssues', { acceptsOthersIssues: true });
     }
 
-    const users = await query.getMany();
+    users = await query.getMany();
     for (const user of users) {
       await this.populateUserExtraFields(user, currentUser);
     }
@@ -337,7 +344,9 @@ export class ProfilesService {
 
     // Gender filter
     let targetGender = currentUser.gender?.toLowerCase() === 'male' ? 'female' : 'male';
-    query.andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
+    console.log(`ProfilesService (getExplore): Target gender for ${currentUser.email} (${currentUser.gender}) is ${targetGender}`);
+    
+    const genderFilteredQuery = query.clone().andWhere('LOWER(user.gender) = :gender', { gender: targetGender });
 
     // Filter connected
     if (!includeConnected) {
