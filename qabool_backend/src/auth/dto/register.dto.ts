@@ -44,10 +44,6 @@ export class RegisterDto {
   @IsString()
   bio?: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  specialConsiderations?: string;
 
   @ApiProperty({ example: 'Berlin, Germany', required: false })
   @IsOptional()

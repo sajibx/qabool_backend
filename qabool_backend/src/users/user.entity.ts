@@ -102,9 +102,6 @@ export class User {
   @Column({ enum: VerifiedStatus, default: VerifiedStatus.INACTIVE })
   verifiedStatus: VerifiedStatus;
 
-  @ApiProperty()
-  @Column({ type: 'text', nullable: true })
-  specialConsiderations: string;
 
   @ApiProperty()
   @Column({ default: false })

@@ -56,10 +56,6 @@ export class UpdateProfileDto {
   @IsNumber()
   weight?: number;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  specialConsiderations?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

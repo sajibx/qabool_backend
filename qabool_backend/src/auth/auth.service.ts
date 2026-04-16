@@ -63,7 +63,6 @@ export class AuthService {
         // profession: registerDto.profession,
         // education: registerDto.education,
         bio: registerDto.bio,
-        specialConsiderations: registerDto.specialConsiderations,
         hasPastIssues: registerDto.hasPastIssues,
         acceptsPastIssues: registerDto.acceptsPastIssues,
         pastIssuesDetails: registerDto.pastIssuesDetails,
