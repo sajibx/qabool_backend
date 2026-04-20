@@ -240,6 +240,10 @@ export class User {
   lookingForMinAge: number;
 
   @ApiProperty({ nullable: true })
+  @Column({ type: 'int', nullable: true })
+  lookingForMaxAge: number;
+
+  @ApiProperty({ nullable: true })
   @Column({ type: 'float', nullable: true })
   lookingForMinHeight: number;
 
@@ -250,4 +254,28 @@ export class User {
   @ApiProperty({ nullable: true })
   @Column({ type: 'float', nullable: true })
   lookingForMaxWeight: number;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  lookingForReligion: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  lookingForReligionSect: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  lookingForReligionCast: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'int', nullable: true })
+  lookingForMonthlyIncome: number;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  lookingForEducation: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  lookingForMaritalStatus: string;
 }

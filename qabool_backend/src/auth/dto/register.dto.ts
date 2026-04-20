@@ -229,6 +229,12 @@ export class RegisterDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
+  lookingForMaxAge?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   lookingForMinHeight?: number;
 
   @ApiProperty({ required: false })
@@ -242,4 +248,35 @@ export class RegisterDto {
   @Type(() => Number)
   @IsNumber()
   lookingForMaxWeight?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForReligion?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForReligionSect?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForReligionCast?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMonthlyIncome?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForEducation?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  lookingForMaritalStatus?: string;
 }

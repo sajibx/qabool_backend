@@ -91,9 +91,16 @@ export class AuthService {
         otherRequirements: registerDto.otherRequirements,
         managedBySomeoneElse: registerDto.managedBySomeoneElse,
         lookingForMinAge: registerDto.lookingForMinAge,
+        lookingForMaxAge: registerDto.lookingForMaxAge,
         lookingForMinHeight: registerDto.lookingForMinHeight,
         lookingForMinWeight: registerDto.lookingForMinWeight,
         lookingForMaxWeight: registerDto.lookingForMaxWeight,
+        lookingForReligion: registerDto.lookingForReligion,
+        lookingForReligionSect: registerDto.lookingForReligionSect,
+        lookingForReligionCast: registerDto.lookingForReligionCast,
+        lookingForMonthlyIncome: registerDto.lookingForMonthlyIncome,
+        lookingForEducation: registerDto.lookingForEducation,
+        lookingForMaritalStatus: registerDto.lookingForMaritalStatus,
       });
 
       console.log('User created successfully:', user.id);
