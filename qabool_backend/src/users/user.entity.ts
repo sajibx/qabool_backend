@@ -60,6 +60,10 @@ export class User {
 
   @ApiProperty()
   @Column({ nullable: true })
+  ethnicity: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
   region: string;
 
   @ApiProperty()
@@ -230,4 +234,20 @@ export class User {
   @ApiProperty({ nullable: true })
   @Column({ nullable: true })
   language: string;
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'int', nullable: true })
+  lookingForMinAge: number;
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'float', nullable: true })
+  lookingForMinHeight: number;
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'float', nullable: true })
+  lookingForMinWeight: number;
+
+  @ApiProperty({ nullable: true })
+  @Column({ type: 'float', nullable: true })
+  lookingForMaxWeight: number;
 }

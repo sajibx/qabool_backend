@@ -205,4 +205,33 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   language?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  ethnicity?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinAge?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinHeight?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinWeight?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMaxWeight?: number;
 }

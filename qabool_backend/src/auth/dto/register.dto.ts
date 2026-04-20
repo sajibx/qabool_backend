@@ -1,5 +1,6 @@
-import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsArray } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsArray, IsBoolean, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 
 export class RegisterDto {
   @ApiProperty({ example: 'test@example.com' })
@@ -33,10 +34,14 @@ export class RegisterDto {
 
   @ApiProperty({ example: 175, required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   height?: number;
 
   @ApiProperty({ example: 70, required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   weight?: number;
 
   @ApiProperty({ example: 'I love coding...', required: false })
@@ -52,10 +57,14 @@ export class RegisterDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   hasPastIssues?: boolean;
 
   @ApiProperty({ example: false, required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   acceptsPastIssues?: boolean;
 
   @ApiProperty({ required: false })
@@ -85,14 +94,20 @@ export class RegisterDto {
 
   @ApiProperty({ example: 5000, required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   monthlyIncome?: number;
 
   @ApiProperty({ example: 2, required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   siblings?: number;
 
   @ApiProperty({ example: 4, required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   familyMembers?: number;
 
   @ApiProperty({ example: '25-30', required: false })
@@ -166,10 +181,24 @@ export class RegisterDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsString()
+  ethnicity?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  otherRequirements?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   managedBySomeoneElse?: boolean;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   facingChallenges?: boolean;
 
   @ApiProperty({ required: false, type: [String] })
@@ -180,6 +209,8 @@ export class RegisterDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   readyToQaboolChallenges?: boolean;
 
   @ApiProperty({ required: false, type: [String] })
@@ -187,4 +218,28 @@ export class RegisterDto {
   @IsArray()
   @IsString({ each: true })
   readyToQaboolChallengesList?: string[];
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinAge?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinHeight?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMinWeight?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lookingForMaxWeight?: number;
 }

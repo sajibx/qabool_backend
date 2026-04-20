@@ -85,6 +85,9 @@ export class AuthService {
         hobbies: registerDto.hobbies,
         // hasChildren: registerDto.hasChildren,
         grewUpIn: registerDto.grewUpIn,
+        lookingForMinAge: registerDto.lookingForMinAge,
+        lookingForMinHeight: registerDto.lookingForMinHeight,
+        lookingForMinWeight: registerDto.lookingForMinWeight,
       });
 
       console.log('User created successfully:', user.id);
